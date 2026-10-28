@@ -217,26 +217,36 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 <!-- LOGIN SCREEN -->
 <div class="login-overlay" id="loginScreen">
   <div class="login-card">
-    <div class="login-icon">💊</div>
-    <h2>SIRAPAT Login</h2>
-    <p>Silakan masuk untuk mengakses sistem</p>
-    <form class="login-form" id="formLogin" onsubmit="return false">
-      <div class="field">
-        <label>Username</label>
-        <input type="text" id="loginUser" placeholder="Masukkan username" required>
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Masukkan password" required>
-      </div>
-      <div class="login-err" id="loginErr">Username atau password salah!</div>
-      <button type="button" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">🔑 Masuk</button>
-    </form>
-    <div style="margin-top:20px;font-size:11px;color:var(--muted);text-align:left;background:#f8fafc;padding:12px;border-radius:8px">
-      <b>Akun Demo:</b><br>
-      Superadmin: <code>superadmin</code> / <code>super123</code><br>
-      Admin Depo: <code>admin</code> / <code>admin123</code>
+    
+    <!-- Tampilan Pilihan Role -->
+    <div id="roleSelection">
+      <div class="login-icon">💊</div>
+      <h2>SIRAPAT</h2>
+      <p>Pilih tipe akses Anda</p>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px; padding:14px; font-size:14px" onclick="showSuperadminLogin()">🔑 Masuk sebagai Superadmin</button>
+      <button class="btn btn-outline" style="width:100%;justify-content:center;padding:14px; font-size:14px" onclick="loginAsDepo()">🏥 Masuk sebagai Admin Depo</button>
     </div>
+
+    <!-- Tampilan Form Login Superadmin -->
+    <div id="superadminLogin" style="display:none">
+      <div class="login-icon">🔒</div>
+      <h2>Login Superadmin</h2>
+      <p>Masukkan kredensial Anda</p>
+      <form class="login-form" id="formLogin" onsubmit="return false">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="loginUser" placeholder="Masukkan username" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Masukkan password" required>
+        </div>
+        <div class="login-err" id="loginErr">Username atau password salah!</div>
+        <button type="button" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">🔑 Masuk</button>
+      </form>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:12px" onclick="showRoleSelection()">← Kembali</button>
+    </div>
+
   </div>
 </div>
 
@@ -539,6 +549,26 @@ let currentLetterHTML = '';
 let pendingFiles = [];
 
 /* ============ AUTHENTICATION & RBAC ============ */
+function showSuperadminLogin() {
+  document.getElementById('roleSelection').style.display = 'none';
+  document.getElementById('superadminLogin').style.display = 'block';
+  document.getElementById('loginUser').focus();
+}
+
+function showRoleSelection() {
+  document.getElementById('superadminLogin').style.display = 'none';
+  document.getElementById('roleSelection').style.display = 'block';
+  document.getElementById('loginErr').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function loginAsDepo() {
+  currentUser = { name: 'Admin Depo', role: 'admin_depo' };
+  localStorage.setItem('sirapat_user', JSON.stringify(currentUser));
+  initApp();
+}
+
 function doLogin(){
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value.trim();
@@ -546,8 +576,6 @@ function doLogin(){
 
   if(u === 'superadmin' && p === 'super123'){
     currentUser = { name: 'Super Admin', role: 'superadmin' };
-  } else if(u === 'admin' && p === 'admin123'){
-    currentUser = { name: 'Admin Depo', role: 'admin_depo' };
   } else {
     err.style.display = 'block';
     return;
@@ -574,6 +602,7 @@ function checkAuth(){
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('mainApp').style.display = 'none';
+    showRoleSelection(); // Pastikan kembali ke tampilan awal pilihan role
   }
 }
 
