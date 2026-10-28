@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIRAPAT - Sistem Undangan Rapat Depo Farmasi</title>
 <style>
+/* CSS SAMA SEPERTI SEBELUMNYA (Tidak ada yang diubah) */
 :root{
   --primary:#0f766e; --primary-dark:#115e59; --primary-light:#ccfbf1;
   --bg:#f1f5f9; --card:#fff; --text:#0f172a; --muted:#64748b;
@@ -15,7 +16,8 @@
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .app{display:flex;min-height:100vh}
 
-/* LOGIN SCREEN */
+/* ... (Salin semua CSS dari kode Anda sebelumnya ke sini) ... */
+
 .login-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
 .login-card{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,.1);border:1px solid var(--border);text-align:center}
 .login-icon{width:64px;height:64px;background:var(--primary-light);color:var(--primary);border-radius:16px;display:grid;place-items:center;font-size:32px;margin:0 auto 20px}
@@ -25,7 +27,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .login-form .field{margin-bottom:16px}
 .login-err{color:var(--danger);font-size:12px;margin-top:-10px;margin-bottom:16px;display:none}
 
-/* SIDEBAR */
 .sidebar{width:260px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;padding:24px 16px;position:fixed;height:100vh;overflow-y:auto;z-index:100;transition:.3s;display:flex;flex-direction:column}
 .brand{display:flex;align-items:center;gap:12px;padding:0 8px 22px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:18px}
 .brand-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:11px;display:grid;place-items:center;font-size:22px}
@@ -41,7 +42,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .btn-logout{background:none;border:none;color:#fca5a5;cursor:pointer;font-size:12px;font-weight:600;text-decoration:underline}
 .btn-logout:hover{color:#fff}
 
-/* MAIN */
 .main{flex:1;margin-left:260px;padding:28px;max-width:calc(100% - 260px)}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px}
 .topbar h2{font-size:23px;font-weight:700}
@@ -54,7 +54,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .card h3{font-size:16.5px;margin-bottom:5px;display:flex;align-items:center;gap:8px}
 .card .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
 
-/* FORM */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .field{display:flex;flex-direction:column;gap:6px}
 .field.full{grid-column:1/-1}
@@ -77,14 +76,12 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .btn-danger:hover{background:#fecaca}
 .btn-sm{padding:7px 12px;font-size:12px;border-radius:7px}
 
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px}
 .stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
 .stat-ico{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-size:22px;background:var(--primary-light);color:var(--primary-dark);flex-shrink:0}
 .stat b{font-size:22px;display:block;line-height:1.1}
 .stat span{font-size:12px;color:var(--muted)}
 
-/* UPLOAD ZONE */
 .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:38px 20px;text-align:center;cursor:pointer;transition:.2s;background:#f8fafc}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);background:var(--primary-light)}
 .upload-zone .icon{font-size:46px;margin-bottom:10px;display:block}
@@ -92,7 +89,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .upload-zone .hint{font-size:12px;color:var(--muted);margin-top:6px}
 .upload-zone .hint b{color:var(--primary-dark)}
 
-/* FILE LIST */
 .file-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;gap:14px;flex-wrap:wrap;background:#fff;transition:.2s}
 .file-item:hover{border-color:var(--primary)}
 .file-icon{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:#fee2e2;color:var(--danger);flex-shrink:0}
@@ -102,7 +98,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .file-main .ket{font-style:italic;margin-top:2px;color:#475569}
 .file-actions{display:flex;gap:6px;flex-wrap:wrap}
 
-/* COLLAPSIBLE */
 .collapse-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;gap:10px}
 .collapse-head h3{margin:0}
 .chev{transition:.25s;color:var(--muted);font-size:14px}
@@ -110,7 +105,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .collapse-body{display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
 .collapse-body.open{display:block;animation:fade .25s}
 
-/* TEMPLATE */
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .tpl-card{border:1.5px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:.2s;background:#fff}
 .tpl-card:hover{border-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-2px)}
@@ -118,7 +112,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .tpl-card h4{font-size:14.5px;word-break:break-all}
 .tpl-card p{font-size:12px;color:var(--muted);flex:1;line-height:1.5}
 
-/* HISTORY */
 .history-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;gap:12px;flex-wrap:wrap;background:#fff;transition:.2s}
 .history-item:hover{border-color:var(--primary)}
 .hi-main{flex:1;min-width:200px}
@@ -127,7 +120,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .hi-actions{display:flex;gap:6px;flex-wrap:wrap}
 .badge{font-size:10.5px;padding:3px 9px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark);font-weight:600}
 
-/* MONITORING */
 .mon-filter{display:flex;gap:14px;flex-wrap:wrap;align-items:end}
 .mon-filter .field{margin:0;min-width:160px}
 .mon-card{display:flex;gap:16px;padding:18px;border-radius:12px;border:1.5px solid var(--border);margin-bottom:12px;align-items:center;background:#fff;transition:.2s}
@@ -150,7 +142,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty .icon{font-size:48px;opacity:.3;margin-bottom:10px;display:block}
 
-/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:1000;padding:24px;overflow-y:auto}
 .modal-overlay.show{display:flex;justify-content:center;align-items:flex-start}
 .modal{background:#fff;border-radius:12px;max-width:820px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);margin:auto}
@@ -161,7 +152,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .icon-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:6px}
 .icon-btn:hover{background:#e2e8f0;color:var(--text)}
 
-/* LETTER */
 .letter{font-family:'Times New Roman',serif;color:#000;line-height:1.65;font-size:14px}
 .letter .kop{display:flex;gap:16px;align-items:center;padding-bottom:12px;margin-bottom:2px}
 .letter .kop .logo{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-size:32px;flex-shrink:0;border:2px solid var(--primary);color:var(--primary)}
@@ -184,7 +174,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .letter .ttd-inner .space{height:72px}
 .letter .ttd-inner .name{font-weight:bold;text-decoration:underline}
 
-/* PRINT */
 #printArea{display:none}
 @media print{
   body{background:#fff}
@@ -193,7 +182,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   @page{margin:2cm;size:A4}
 }
 
-/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:9px;font-size:13.5px;font-weight:500;z-index:3000;opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90%}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:var(--success)}
@@ -214,11 +202,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div class="login-overlay" id="loginScreen">
   <div class="login-card">
-    
-    <!-- Tampilan Pilihan Role -->
     <div id="roleSelection">
       <div class="login-icon">💊</div>
       <h2>SIRAPAT</h2>
@@ -226,8 +211,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px; padding:14px; font-size:14px" onclick="showSuperadminLogin()">🔑 Masuk sebagai Superadmin</button>
       <button class="btn btn-outline" style="width:100%;justify-content:center;padding:14px; font-size:14px" onclick="loginAsDepo()">🏥 Masuk sebagai Admin Depo</button>
     </div>
-
-    <!-- Tampilan Form Login Superadmin -->
     <div id="superadminLogin" style="display:none">
       <div class="login-icon">🔒</div>
       <h2>Login Superadmin</h2>
@@ -246,7 +229,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </form>
       <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:12px" onclick="showRoleSelection()">← Kembali</button>
     </div>
-
   </div>
 </div>
 
@@ -256,9 +238,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       <div class="brand-icon">💊</div>
       <div><h1>SIRAPAT</h1><p>Undangan Rapat Depo Farmasi</p></div>
     </div>
-    <nav class="nav" id="navMenu">
-      <!-- Menu di-generate via JS berdasarkan Role -->
-    </nav>
+    <nav class="nav" id="navMenu"></nav>
     <div class="user-info">
       <div>
         <div style="font-weight:600;margin-bottom:2px" id="userNameDisplay">User</div>
@@ -269,20 +249,17 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   </aside>
 
   <main class="main">
-    <!-- UPLOAD HASIL RAPAT -->
     <section class="page active" id="page-upload">
       <div class="topbar">
         <div><h2>Upload Hasil Rapat</h2><p>Unggah berkas hasil rapat dalam format PDF</p></div>
       </div>
-
       <div class="stats">
         <div class="stat"><div class="stat-ico">📄</div><div><b id="upStatTotal">0</b><span>Total Berkas</span></div></div>
         <div class="stat"><div class="stat-ico">📅</div><div><b id="upStatBulan">0</b><span>Bulan Ini</span></div></div>
       </div>
-
       <div class="card">
         <h3>📤 Unggah Berkas PDF</h3>
-        <p class="sub">Hanya menerima file <b>PDF</b>, maksimal 25MB per file. Bisa pilih beberapa file sekaligus.</p>
+        <p class="sub">Hanya menerima file <b>PDF</b>, maksimal 25MB per file.</p>
         <div class="upload-zone" id="uploadZone">
           <span class="icon">📄</span>
           <p><b>Klik atau seret file PDF ke sini</b></p>
@@ -315,7 +292,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           <button class="btn btn-ghost" onclick="resetUploadForm()">↺ Reset</button>
         </div>
       </div>
-
       <div class="card">
         <h3>📁 Berkas Terunggah</h3>
         <p class="sub">Daftar berkas hasil rapat yang sudah diunggah.</p>
@@ -323,13 +299,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- TEMPLATE (SUPERADMIN & ADMIN DEPO) -->
     <section class="page" id="page-template">
       <div class="topbar">
         <div><h2>Download Template</h2><p>Unduh format dokumen yang telah disediakan oleh Superadmin</p></div>
       </div>
-
-      <!-- UPLOAD TEMPLATE KHUSUS SUPERADMIN -->
       <div class="card" id="superadminUploadSection" style="display:none; border-left:4px solid var(--primary); background:#f0fdfa">
         <h3>📤 Upload Template Baru (Khusus Superadmin)</h3>
         <p class="sub">Unggah file <b>.docx</b> atau <b>.doc</b> agar bisa diunduh oleh Admin Depo.</p>
@@ -351,46 +324,33 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           <button class="btn btn-primary" onclick="uploadTemplate()">📤 Upload Template</button>
         </div>
       </div>
-
       <div class="card">
         <h3>📁 Daftar Template Tersedia</h3>
         <p class="sub">Silakan unduh template di bawah ini untuk digunakan.</p>
-        <div class="tpl-grid" id="templateGrid">
-          <!-- Template dari Superadmin akan di-render via JS -->
-        </div>
+        <div class="tpl-grid" id="templateGrid"></div>
       </div>
     </section>
 
-    <!-- MONITORING BULANAN (KHUSUS SUPERADMIN) -->
     <section class="page" id="page-monitoring">
       <div class="topbar">
         <div><h2>Monitoring Bulanan</h2><p>Pantau status rapat tiap depo per bulan</p></div>
       </div>
-
       <div class="card">
         <h3>📅 Pilih Periode</h3>
         <p class="sub">Pilih bulan dan tahun untuk melihat status rapat tiap depo.</p>
         <div class="mon-filter">
-          <div class="field">
-            <label>Bulan</label>
-            <select id="monBulan"></select>
-          </div>
-          <div class="field">
-            <label>Tahun</label>
-            <select id="monTahun"></select>
-          </div>
+          <div class="field"><label>Bulan</label><select id="monBulan"></select></div>
+          <div class="field"><label>Tahun</label><select id="monTahun"></select></div>
           <button class="btn btn-primary" onclick="renderMonitoring()">🔄 Tampilkan</button>
           <button class="btn btn-ghost" onclick="setMonBulanIni()">📌 Bulan Ini</button>
         </div>
       </div>
-
       <div class="stats">
         <div class="stat"><div class="stat-ico" style="background:#dcfce7;color:#166534">✅</div><div><b id="monStatSudah">0</b><span>Sudah Rapat</span></div></div>
         <div class="stat"><div class="stat-ico" style="background:#dbeafe;color:#1e40af">⏳</div><div><b id="monStatTerjadwal">0</b><span>Terjadwal</span></div></div>
         <div class="stat"><div class="stat-ico" style="background:#fef3c7;color:#92400e">⚠️</div><div><b id="monStatBelum">0</b><span>Belum Rapat</span></div></div>
         <div class="stat"><div class="stat-ico">📈</div><div><b id="monStatPersen">0%</b><span>Progres</span></div></div>
       </div>
-
       <div class="card">
         <h3>🏥 Status Rapat per Depo</h3>
         <p class="sub" id="monSubtitle">Menampilkan status rapat bulan ini.</p>
@@ -398,7 +358,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- BUAT UNDANGAN (KHUSUS SUPERADMIN) -->
     <section class="page" id="page-buat">
       <div class="topbar">
         <div><h2>Buat Undangan Rapat</h2><p>Isi data rapat, lalu preview dan cetak undangan</p></div>
@@ -456,8 +415,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           </div>
         </form>
       </div>
-
-      <!-- KOP SURAT (PANEL LIPAT) -->
       <div class="card">
         <div class="collapse-head" id="kopHead" onclick="toggleKop()">
           <h3>⚙️ Kop Surat &amp; Penandatangan</h3>
@@ -484,7 +441,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- RIWAYAT (KHUSUS SUPERADMIN) -->
     <section class="page" id="page-riwayat">
       <div class="topbar">
         <div><h2>Riwayat Undangan</h2><p>Daftar undangan yang telah dibuat</p></div>
@@ -502,7 +458,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 
 <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
-<!-- PREVIEW MODAL -->
 <div class="modal-overlay" id="previewModal">
   <div class="modal">
     <div class="modal-head">
@@ -519,6 +474,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 <div id="printArea"></div>
 
 <script>
+/* ============ KONFIGURASI GOOGLE SHEETS ============ */
+// GANTI URL INI DENGAN URL HASIL DEPLOY DARI LANGKAH 2
+const URL_GOOGLE_APPS_SCRIPT = "URL_GOOGLE_APPS_SCRIPT_ANDA";
+
 /* ============ DATA & KONFIGURASI ============ */
 const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -541,7 +500,6 @@ const DEFAULT_SETTINGS = {
   nip:'19800101 200501 1 001'
 };
 
-// State Aplikasi
 let currentUser = null;
 let settings = loadSettings();
 let riwayat = loadRiwayat();
@@ -554,7 +512,6 @@ function showSuperadminLogin() {
   document.getElementById('superadminLogin').style.display = 'block';
   document.getElementById('loginUser').focus();
 }
-
 function showRoleSelection() {
   document.getElementById('superadminLogin').style.display = 'none';
   document.getElementById('roleSelection').style.display = 'block';
@@ -562,18 +519,15 @@ function showRoleSelection() {
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
 }
-
 function loginAsDepo() {
   currentUser = { name: 'Admin Depo', role: 'admin_depo' };
   localStorage.setItem('sirapat_user', JSON.stringify(currentUser));
   initApp();
 }
-
 function doLogin(){
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value.trim();
   const err = document.getElementById('loginErr');
-
   if(u === 'superadmin' && p === 'super123'){
     currentUser = { name: 'Super Admin', role: 'superadmin' };
   } else {
@@ -584,12 +538,10 @@ function doLogin(){
   localStorage.setItem('sirapat_user', JSON.stringify(currentUser));
   initApp();
 }
-
 function doLogout(){
   localStorage.removeItem('sirapat_user');
   location.reload();
 }
-
 function checkAuth(){
   const saved = localStorage.getItem('sirapat_user');
   if(saved){
@@ -602,35 +554,28 @@ function checkAuth(){
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('mainApp').style.display = 'none';
-    showRoleSelection(); // Pastikan kembali ke tampilan awal pilihan role
+    showRoleSelection();
   }
 }
 
 function renderMenus(){
   const nav = document.getElementById('navMenu');
   const isSuper = currentUser.role === 'superadmin';
-  
   let menus = [
     { id: 'upload', icon: '📤', text: 'Upload Hasil Rapat' },
     { id: 'template', icon: '📥', text: 'Download Template' }
   ];
-
   if(isSuper){
     menus.splice(1, 0, { id: 'monitoring', icon: '📊', text: 'Monitoring Bulanan' });
     menus.push({ id: 'riwayat', icon: '📋', text: 'Riwayat Undangan' });
   }
-
   nav.innerHTML = menus.map(m => `
     <button class="nav-item" data-page="${m.id}" onclick="goPage('${m.id}')">
       <span class="icon">${m.icon}</span> ${m.text}
     </button>
   `).join('');
-  
-  // Update User Info
   document.getElementById('userNameDisplay').textContent = currentUser.name;
   document.getElementById('userRoleDisplay').textContent = isSuper ? 'Superadmin' : 'Admin Depo';
-  
-  // Tampilkan form upload template khusus Superadmin
   document.getElementById('superadminUploadSection').style.display = isSuper ? 'block' : 'none';
 }
 
@@ -699,15 +644,11 @@ const STORE_TEMPLATES = 'templates';
 
 function openDB(){
   return new Promise((resolve,reject)=>{
-    const req = indexedDB.open(DB_NAME,2); // Upgrade version for templates
+    const req = indexedDB.open(DB_NAME,2);
     req.onupgradeneeded = e=>{
       const db = e.target.result;
-      if(!db.objectStoreNames.contains(STORE_BERKAS)){
-        db.createObjectStore(STORE_BERKAS,{keyPath:'id'});
-      }
-      if(!db.objectStoreNames.contains(STORE_TEMPLATES)){
-        db.createObjectStore(STORE_TEMPLATES,{keyPath:'id'});
-      }
+      if(!db.objectStoreNames.contains(STORE_BERKAS)) db.createObjectStore(STORE_BERKAS,{keyPath:'id'});
+      if(!db.objectStoreNames.contains(STORE_TEMPLATES)) db.createObjectStore(STORE_TEMPLATES,{keyPath:'id'});
     };
     req.onsuccess = e=>resolve(e.target.result);
     req.onerror = e=>reject(e.target.error);
@@ -755,9 +696,7 @@ async function uploadTemplate(){
   
   if(!fileInput.files.length){ toast('Pilih file terlebih dahulu','error'); return; }
   const file = fileInput.files[0];
-  
   if(!nameInput.value.trim()){ toast('Nama template wajib diisi','error'); return; }
-  
   const isDoc = file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.docx');
   if(!isDoc){ toast('Hanya file Word (.doc / .docx) yang diizinkan','error'); return; }
 
@@ -782,12 +721,10 @@ async function uploadTemplate(){
 
 async function renderTemplates(){
   const grid = document.getElementById('templateGrid');
-
   let uploadedHtml = '';
   try {
     const files = await dbGetAll(STORE_TEMPLATES);
     files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
-    
     if(files.length > 0){
       uploadedHtml = files.map(f => `
         <div class="tpl-card" style="border-color:var(--primary)">
@@ -809,11 +746,7 @@ async function renderTemplates(){
         </div>
       `;
     }
-  } catch(e) { 
-    console.error(e); 
-    uploadedHtml = `<div class="empty"><p>Gagal memuat template.</p></div>`;
-  }
-
+  } catch(e) { uploadedHtml = `<div class="empty"><p>Gagal memuat template.</p></div>`; }
   grid.innerHTML = uploadedHtml;
 }
 
@@ -824,40 +757,28 @@ async function downloadUploadedTemplate(id){
     if(!f || !f.blob){ toast('File tidak ditemukan','error'); return; }
     const url = URL.createObjectURL(f.blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = f.fileName;
+    a.href = url; a.download = f.fileName;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(url), 1500);
     toast('Mengunduh: '+f.name,'success');
   }catch(e){ toast('Gagal mengunduh: '+e.message,'error'); }
 }
-
 async function hapusTemplate(id){
-  if(!confirm('Hapus template ini? Admin depo tidak akan bisa mengunduhnya lagi.')) return;
-  try{
-    await dbDelete(STORE_TEMPLATES, id);
-    toast('Template dihapus','success');
-    renderTemplates();
-  }catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
+  if(!confirm('Hapus template ini?')) return;
+  try{ await dbDelete(STORE_TEMPLATES, id); toast('Template dihapus','success'); renderTemplates(); }
+  catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
 }
-
 
 /* ============ UPLOAD BERKAS PDF HASIL RAPAT ============ */
 function setupUploadZone(){
   const zone = document.getElementById('uploadZone');
   const input = document.getElementById('fileInput');
-
   zone.addEventListener('click', ()=>input.click());
   zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('dragover'); });
   zone.addEventListener('dragleave', ()=>zone.classList.remove('dragover'));
-  zone.addEventListener('drop', e=>{
-    e.preventDefault();
-    zone.classList.remove('dragover');
-    handleSelectedFiles(e.dataTransfer.files);
-  });
+  zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('dragover'); handleSelectedFiles(e.dataTransfer.files); });
   input.addEventListener('change', e=>handleSelectedFiles(e.target.files));
 }
-
 function handleSelectedFiles(files){
   const valid = [];
   const MAX = 25*1024*1024;
@@ -869,13 +790,9 @@ function handleSelectedFiles(files){
   }
   pendingFiles = valid;
   const hint = document.getElementById('uploadHint');
-  if(valid.length){
-    hint.innerHTML = `<b>${valid.length} file</b> siap diunggah: ${valid.map(f=>escapeHtml(f.name)).join(', ')}`;
-  } else {
-    hint.textContent = 'Belum ada file dipilih';
-  }
+  if(valid.length){ hint.innerHTML = `<b>${valid.length} file</b> siap diunggah: ${valid.map(f=>escapeHtml(f.name)).join(', ')}`; }
+  else { hint.textContent = 'Belum ada file dipilih'; }
 }
-
 function resetUploadForm(){
   pendingFiles = [];
   document.getElementById('fileInput').value = '';
@@ -884,31 +801,20 @@ function resetUploadForm(){
   document.getElementById('upKeterangan').value = '';
   document.getElementById('uploadHint').textContent = 'Belum ada file dipilih';
 }
-
 async function doUpload(){
   if(!pendingFiles.length){ toast('Pilih file PDF terlebih dahulu','error'); return; }
   const depo = document.getElementById('upDepo').value.trim();
   const tanggal = document.getElementById('upTanggal').value;
   const keterangan = document.getElementById('upKeterangan').value.trim();
-
   let ok = 0, fail = 0;
   for(const file of pendingFiles){
     const item = {
       id: 'pdf_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-      name: file.name,
-      size: file.size,
-      type: 'application/pdf',
-      blob: file,
-      depo, tanggal, keterangan,
-      uploadedAt: new Date().toISOString()
+      name: file.name, size: file.size, type: 'application/pdf', blob: file,
+      depo, tanggal, keterangan, uploadedAt: new Date().toISOString()
     };
-    try{
-      await dbAdd(STORE_BERKAS, item);
-      ok++;
-    }catch(e){
-      fail++;
-      toast('Gagal upload: '+file.name+' — '+e.message,'error');
-    }
+    try{ await dbAdd(STORE_BERKAS, item); ok++; }
+    catch(e){ fail++; toast('Gagal upload: '+file.name+' — '+e.message,'error'); }
   }
   if(ok) toast(ok+' berkas berhasil diunggah','success');
   if(fail) toast(fail+' berkas gagal diunggah','error');
@@ -922,12 +828,10 @@ async function renderUploadedFiles(){
   try{
     const files = await dbGetAll(STORE_BERKAS);
     files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
-
     if(!files.length){
       list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada berkas terunggah.</p><p style="margin-top:8px;font-size:12px">Unggah berkas hasil rapat pada form di atas.</p></div>`;
       return;
     }
-
     list.innerHTML = files.map(f=>`
       <div class="file-item">
         <div class="file-icon">📄</div>
@@ -962,7 +866,7 @@ async function updateUploadStats(){
       return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
     }).length;
     document.getElementById('upStatBulan').textContent = bln;
-  }catch(e){ /* ignore */ }
+  }catch(e){}
 }
 
 async function previewFile(id){
@@ -975,7 +879,6 @@ async function previewFile(id){
     setTimeout(()=>URL.revokeObjectURL(url), 60000);
   }catch(e){ toast('Gagal membuka berkas: '+e.message,'error'); }
 }
-
 async function downloadFile(id){
   try{
     const files = await dbGetAll(STORE_BERKAS);
@@ -983,14 +886,12 @@ async function downloadFile(id){
     if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
     const url = URL.createObjectURL(f.blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = f.name || 'berkas.pdf';
+    a.href = url; a.download = f.name || 'berkas.pdf';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(url), 1500);
     toast('Mengunduh: '+f.name,'success');
   }catch(e){ toast('Gagal mengunduh: '+e.message,'error'); }
 }
-
 async function deleteFile(id){
   if(!confirm('Hapus berkas ini?')) return;
   try{
@@ -1002,44 +903,97 @@ async function deleteFile(id){
   }catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
 }
 
+/* ============ SINKRONISASI KE GOOGLE SHEETS ============ */
+async function syncToGoogleSheet(undanganData) {
+  if (URL_GOOGLE_APPS_SCRIPT.includes("URL_GOOGLE_APPS_SCRIPT_ANDA")) {
+    console.warn("URL Google Apps Script belum diatur. Data hanya tersimpan di localStorage.");
+    return;
+  }
+
+  const payload = {
+    nomor: undanganData.nomor || '',
+    tanggal: undanganData.tanggal || '',
+    depo: undanganData.depo || '',
+    tempat: undanganData.tempat || '',
+    waktu: undanganData.waktu || '',
+    zona: undanganData.zona || '',
+    agenda: undanganData.agenda || '',
+    createdAt: undanganData.createdAt || new Date().toISOString()
+  };
+
+  try {
+    // Menggunakan text/plain untuk menghindari preflight CORS pada Google Apps Script
+    const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    if (response.ok) {
+      console.log("Data berhasil dikirim ke Google Sheets");
+    }
+  } catch (error) {
+    console.error("Gagal sinkronisasi ke Google Sheets:", error);
+  }
+}
+
+async function loadFromGoogleSheet() {
+  if (URL_GOOGLE_APPS_SCRIPT.includes("URL_GOOGLE_APPS_SCRIPT_ANDA")) return;
+
+  try {
+    const response = await fetch(URL_GOOGLE_APPS_SCRIPT);
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      // Timpa riwayat lokal dengan data dari Sheets agar sinkron
+      riwayat = data.map((row, idx) => ({
+        id: 'sheet_' + idx,
+        nomor: row.nomor || '',
+        tanggal: row.tanggal || '',
+        depo: row.depo || '',
+        tempat: row.tempat || '',
+        waktu: row.waktu || '',
+        zona: row.zona || '',
+        agenda: row.agenda || '',
+        createdAt: row.createdAt || new Date().toISOString()
+      })).reverse(); // Terbaru di atas
+      saveRiwayat();
+    }
+  } catch (error) {
+    console.error("Gagal memuat data dari Google Sheets:", error);
+  }
+}
+
+
 /* ============ MONITORING BULANAN ============ */
 function initMonFilter(){
   const now = new Date();
   const bSel = document.getElementById('monBulan');
   bSel.innerHTML = BULAN.map((b,i)=>`<option value="${i}">${b}</option>`).join('');
   bSel.value = now.getMonth();
-
   const tSel = document.getElementById('monTahun');
   const years = new Set();
   const curY = now.getFullYear();
   for(let y = curY - 2; y <= curY + 3; y++) years.add(y);
   riwayat.forEach(r=>{
-    if(r.tanggal){
-      const y = parseInt(r.tanggal.split('-')[0]);
-      if(y) years.add(y);
-    }
+    if(r.tanggal){ const y = parseInt(r.tanggal.split('-')[0]); if(y) years.add(y); }
   });
   const sorted = [...years].sort((a,b)=>b-a);
   tSel.innerHTML = sorted.map(y=>`<option value="${y}">${y}</option>`).join('');
   tSel.value = curY;
-
   bSel.addEventListener('change', renderMonitoring);
   tSel.addEventListener('change', renderMonitoring);
 }
-
 function setMonBulanIni(){
   const now = new Date();
   document.getElementById('monBulan').value = now.getMonth();
   document.getElementById('monTahun').value = now.getFullYear();
   renderMonitoring();
 }
-
 function parseTanggalBulan(tglStr){
   if(!tglStr) return null;
   const parts = tglStr.split('-');
   if(parts.length < 2) return null;
-  const y = parseInt(parts[0]);
-  const m = parseInt(parts[1]);
+  const y = parseInt(parts[0]); const m = parseInt(parts[1]);
   if(!y || !m) return null;
   return { y, m: m - 1 };
 }
@@ -1047,7 +1001,6 @@ function parseTanggalBulan(tglStr){
 async function renderMonitoring(){
   const bln = parseInt(document.getElementById('monBulan').value);
   const thn = parseInt(document.getElementById('monTahun').value);
-
   const subtitle = document.getElementById('monSubtitle');
   subtitle.textContent = `Menampilkan status rapat bulan ${BULAN[bln]} ${thn}.`;
 
@@ -1055,7 +1008,6 @@ async function renderMonitoring(){
     const p = parseTanggalBulan(r.tanggal);
     return p && p.y === thn && p.m === bln;
   });
-
   let files = [];
   try { files = await dbGetAll(STORE_BERKAS); } catch(e){}
   const hasilBulan = files.filter(f=>{
@@ -1063,7 +1015,6 @@ async function renderMonitoring(){
     const p = parseTanggalBulan(tgl);
     return p && p.y === thn && p.m === bln;
   });
-
   const data = DEPO_LIST.map(depo=>{
     const key = depo.trim().toLowerCase();
     const u = undanganBulan.filter(x => (x.depo||'').trim().toLowerCase() === key);
@@ -1083,27 +1034,20 @@ async function renderMonitoring(){
   document.getElementById('monStatPersen').textContent = Math.round(sudah/DEPO_LIST.length*100) + '%';
 
   const list = document.getElementById('monList');
-  if(!data.length){
-    list.innerHTML = `<div class="empty"><p>Tidak ada depo terdaftar.</p></div>`;
-    return;
-  }
-
+  if(!data.length){ list.innerHTML = `<div class="empty"><p>Tidak ada depo terdaftar.</p></div>`; return; }
   list.innerHTML = data.map(d=>{
     const isSudah = d.status === 'sudah';
     const isTerjadwal = d.status === 'terjadwal';
     const badgeClass = isSudah ? 'badge-ok' : (isTerjadwal ? 'badge-info' : 'badge-warn');
     const badgeText = isSudah ? '✅ Sudah Rapat' : (isTerjadwal ? '⏳ Terjadwal' : '⚠️ Belum Rapat');
     const icon = isSudah ? '✅' : (isTerjadwal ? '⏳' : '⚠️');
-
     let detail = '';
     if(isSudah){
       const lines = [];
       if(d.undangan.length){
         const u = d.undangan.slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||''))[0];
         lines.push(`<span class="line">📝 Undangan: ${formatTanggal(u.tanggal)}${u.agenda ? ' — '+escapeHtml(u.agenda) : ''}</span>`);
-      } else {
-        lines.push(`<span class="line">📝 Undangan: <i>tidak ada</i></span>`);
-      }
+      } else { lines.push(`<span class="line">📝 Undangan: <i>tidak ada</i></span>`); }
       if(d.hasil.length){
         const h = d.hasil.slice().sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt))[0];
         const tglHasil = h.tanggal || (h.uploadedAt||'').slice(0,10);
@@ -1116,9 +1060,7 @@ async function renderMonitoring(){
     } else {
       detail = `<span class="line">Belum ada undangan maupun hasil rapat pada bulan ini.</span>`;
     }
-
     const subInfo = (isSudah || isTerjadwal) ? `<p class="mon-sub">Undangan: ${d.undangan.length} · Hasil: ${d.hasil.length}</p>` : '';
-
     return `
       <div class="mon-card mon-${d.status}">
         <div class="mon-icon">${icon}</div>
@@ -1270,6 +1212,9 @@ function simpanUndangan(){
   saveRiwayat();
   renderRiwayat();
   toast('Undangan berhasil disimpan ke riwayat','success');
+  
+  // SINKRONISASI KE GOOGLE SHEETS
+  syncToGoogleSheet(item);
 }
 
 /* ============ RENDER RIWAYAT ============ */
@@ -1332,12 +1277,13 @@ function simpanSettings(){
 }
 
 /* ============ INIT APLIKASI ============ */
-function initApp(){
+async function initApp(){
   renderMenus();
   
-  // Set menu pertama sebagai default (Upload)
-  goPage('upload');
+  // Muat data terbaru dari Google Sheets (jika URL sudah diset)
+  await loadFromGoogleSheet();
   
+  goPage('upload');
   setDefaultFormValues();
   loadSettingsToForm();
   renderRiwayat();
@@ -1347,7 +1293,6 @@ function initApp(){
   renderTemplates();
 }
 
-// Cek login saat halaman dimuat
 window.addEventListener('DOMContentLoaded', checkAuth);
 </script>
 </body>
