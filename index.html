@@ -224,7 +224,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       <div class="stats">
         <div class="stat"><div class="stat-ico">📄</div><div><b id="upStatTotal">0</b><span>Total Berkas</span></div></div>
         <div class="stat"><div class="stat-ico">📅</div><div><b id="upStatBulan">0</b><span>Bulan Ini</span></div></div>
-        <div class="stat"><div class="stat-ico">💾</div><div><b id="upStatSize">0 KB</b><span>Total Ukuran</span></div></div>
       </div>
 
       <div class="card">
@@ -512,12 +511,6 @@ function formatWaktu(t){
   if(!t) return '-';
   return t.replace(':','.');
 }
-function formatSize(bytes){
-  if(!bytes) return '0 B';
-  if(bytes < 1024) return bytes + ' B';
-  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-  return (bytes/1024/1024).toFixed(2) + ' MB';
-}
 function formatTanggalWaktu(iso){
   if(!iso) return '-';
   try{
@@ -698,7 +691,7 @@ async function renderUploadedFiles(){
           <p>
             ${f.depo ? '🏥 '+escapeHtml(f.depo)+' &nbsp;·&nbsp; ' : ''}
             ${f.tanggal ? '📅 '+formatTanggal(f.tanggal)+' &nbsp;·&nbsp; ' : ''}
-            💾 ${formatSize(f.size)} &nbsp;·&nbsp; ⬆ ${formatTanggalWaktu(f.uploadedAt)}
+            ⬆ ${formatTanggalWaktu(f.uploadedAt)}
           </p>
           ${f.keterangan ? `<p class="ket">📝 ${escapeHtml(f.keterangan)}</p>` : ''}
         </div>
@@ -724,8 +717,6 @@ async function updateUploadStats(){
       return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
     }).length;
     document.getElementById('upStatBulan').textContent = bln;
-    const totalBytes = files.reduce((s,f)=>s+(f.size||0),0);
-    document.getElementById('upStatSize').textContent = formatSize(totalBytes);
   }catch(e){ /* ignore */ }
 }
 
