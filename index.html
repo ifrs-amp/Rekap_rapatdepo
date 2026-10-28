@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIRAPAT - Sistem Undangan Rapat Depo Farmasi</title>
+<style>
+:root{
+  --primary:#0f766e; --primary-dark:#115e59; --primary-light:#ccfbf1;
+  --bg:#f1f5f9; --card:#fff; --text:#0f172a; --muted:#64748b;
+  --border:#e2e8f0; --danger:#dc2626; --success:#16a34a;
+  --radius:12px; --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;padding:24px 16px;position:fixed;height:100vh;overflow-y:auto;z-index:100;transition:.3s}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px 22px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:18px}
+.brand-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:11px;display:grid;place-items:center;font-size:22px}
+.brand h1{font-size:16px;font-weight:700;letter-spacing:.5px}
+.brand p{font-size:11px;opacity:.8}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.2s;border:none;background:none;color:#fff;text-align:left;width:100%;font-family:inherit}
+.nav-item:hover{background:rgba(255,255,255,.1)}
+.nav-item.active{background:rgba(255,255,255,.22);font-weight:600}
+.nav-item .icon{font-size:18px;width:22px;text-align:center}
+
+/* MAIN */
+.main{flex:1;margin-left:260px;padding:28px;max-width:calc(100% - 260px)}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.topbar h2{font-size:23px;font-weight:700}
+.topbar p{color:var(--muted);font-size:13px;margin-top:2px}
+.page{display:none}
+.page.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:18px}
+.card h3{font-size:16.5px;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.card .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
+
+/* FORM */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12.5px;font-weight:600;color:#334155}
+.field label .req{color:var(--danger)}
+.field input,.field select,.field textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;transition:.2s;color:var(--text);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+.field textarea{resize:vertical;min-height:80px}
+.field .hint{font-size:11px;color:var(--muted);font-weight:normal}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:8px;border:none;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,118,110,.3)}
+.btn-outline{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:var(--primary-light)}
+.btn-ghost{background:#f1f5f9;color:#475569}
+.btn-ghost:hover{background:#e2e8f0}
+.btn-danger{background:#fee2e2;color:var(--danger)}
+.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:7px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.stat-ico{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-size:22px;background:var(--primary-light);color:var(--primary-dark);flex-shrink:0}
+.stat b{font-size:22px;display:block;line-height:1.1}
+.stat span{font-size:12px;color:var(--muted)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:38px 20px;text-align:center;cursor:pointer;transition:.2s;background:#f8fafc}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);background:var(--primary-light)}
+.upload-zone .icon{font-size:46px;margin-bottom:10px;display:block}
+.upload-zone p{font-size:14px;color:var(--text)}
+.upload-zone .hint{font-size:12px;color:var(--muted);margin-top:6px}
+.upload-zone .hint b{color:var(--primary-dark)}
+
+/* FILE LIST */
+.file-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;gap:14px;flex-wrap:wrap;background:#fff;transition:.2s}
+.file-item:hover{border-color:var(--primary)}
+.file-icon{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:#fee2e2;color:var(--danger);flex-shrink:0}
+.file-main{flex:1;min-width:200px}
+.file-main h4{font-size:14px;margin-bottom:4px;word-break:break-all}
+.file-main p{font-size:12px;color:var(--muted);line-height:1.5}
+.file-main .ket{font-style:italic;margin-top:2px;color:#475569}
+.file-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* COLLAPSIBLE */
+.collapse-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;gap:10px}
+.collapse-head h3{margin:0}
+.chev{transition:.25s;color:var(--muted);font-size:14px}
+.collapse-head.open .chev{transform:rotate(180deg)}
+.collapse-body{display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.collapse-body.open{display:block;animation:fade .25s}
+
+/* TEMPLATE */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.tpl-card{border:1.5px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:.2s;background:#fff}
+.tpl-card:hover{border-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-2px)}
+.tpl-icon{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-size:22px;background:var(--primary-light);color:var(--primary-dark)}
+.tpl-card h4{font-size:14.5px}
+.tpl-card p{font-size:12px;color:var(--muted);flex:1;line-height:1.5}
+
+/* HISTORY */
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;gap:12px;flex-wrap:wrap;background:#fff;transition:.2s}
+.history-item:hover{border-color:var(--primary)}
+.hi-main{flex:1;min-width:200px}
+.hi-main h4{font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hi-main p{font-size:12px;color:var(--muted);margin-top:2px}
+.hi-actions{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:10.5px;padding:3px 9px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .icon{font-size:48px;opacity:.3;margin-bottom:10px;display:block}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:1000;padding:24px;overflow-y:auto}
+.modal-overlay.show{display:flex;justify-content:center;align-items:flex-start}
+.modal{background:#fff;border-radius:12px;max-width:820px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);margin:auto}
+.modal-head{padding:15px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#f8fafc;position:sticky;top:0;z-index:2;gap:10px;flex-wrap:wrap}
+.modal-head h3{font-size:15.5px}
+.modal-body{padding:24px;max-height:72vh;overflow-y:auto;background:#e2e8f0}
+.modal-body .paper{background:#fff;padding:48px 52px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.icon-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:6px}
+.icon-btn:hover{background:#e2e8f0;color:var(--text)}
+
+/* LETTER */
+.letter{font-family:'Times New Roman',serif;color:#000;line-height:1.65;font-size:14px}
+.letter .kop{display:flex;gap:16px;align-items:center;padding-bottom:12px;margin-bottom:2px}
+.letter .kop .logo{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-size:32px;flex-shrink:0;border:2px solid var(--primary);color:var(--primary)}
+.letter .kop-text{flex:1;text-align:center}
+.letter .kop-text h2{font-size:18px;letter-spacing:.5px}
+.letter .kop-text h3{font-size:14px;font-weight:normal}
+.letter .kop-text p{font-size:11.5px}
+.letter .kop-line{border-bottom:3px double #000;margin-bottom:26px}
+.letter .title{text-align:center;margin:24px 0 6px}
+.letter .title h3{font-size:17px;text-decoration:underline;letter-spacing:1.5px}
+.letter .title p{font-size:13px}
+.letter .meta{margin:18px 0 18px 20px}
+.letter .meta table{border-collapse:collapse}
+.letter .meta td{padding:3px 0;vertical-align:top;font-size:14px}
+.letter .meta td:first-child{width:135px}
+.letter .meta td:nth-child(2){width:12px}
+.letter p.body-text{text-align:justify;margin:12px 0}
+.letter .ttd{margin-top:44px;display:flex;justify-content:flex-end}
+.letter .ttd-inner{text-align:center;min-width:220px}
+.letter .ttd-inner .space{height:72px}
+.letter .ttd-inner .name{font-weight:bold;text-decoration:underline}
+
+/* PRINT */
+#printArea{display:none}
+@media print{
+  body{background:#fff}
+  .app,.modal-overlay,.menu-toggle,.toast{display:none!important}
+  #printArea{display:block!important}
+  @page{margin:2cm;size:A4}
+}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:9px;font-size:13.5px;font-weight:500;z-index:3000;opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+
+.menu-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:200;width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;border:none;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 20px rgba(15,118,110,.45);cursor:pointer}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .main{margin-left:0;max-width:100%;padding:16px}
+  .grid{grid-template-columns:1fr}
+  .menu-toggle{display:flex}
+  .modal-body .paper{padding:26px 22px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">💊</div>
+      <div><h1>SIRAPAT</h1><p>Undangan Rapat Depo Farmasi</p></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-page="upload"><span class="icon">📤</span> Upload Hasil Rapat</button>
+      <button class="nav-item" data-page="template"><span class="icon">📥</span> Download Template</button>
+      <button class="nav-item" data-page="buat"><span class="icon">✍️</span> Buat Undangan</button>
+      <button class="nav-item" data-page="riwayat"><span class="icon">📋</span> Riwayat Undangan</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <!-- UPLOAD HASIL RAPAT -->
+    <section class="page active" id="page-upload">
+      <div class="topbar">
+        <div><h2>Upload Hasil Rapat</h2><p>Unggah berkas hasil rapat dalam format PDF</p></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-ico">📄</div><div><b id="upStatTotal">0</b><span>Total Berkas</span></div></div>
+        <div class="stat"><div class="stat-ico">📅</div><div><b id="upStatBulan">0</b><span>Bulan Ini</span></div></div>
+        <div class="stat"><div class="stat-ico">💾</div><div><b id="upStatSize">0 KB</b><span>Total Ukuran</span></div></div>
+      </div>
+
+      <div class="card">
+        <h3>📤 Unggah Berkas PDF</h3>
+        <p class="sub">Hanya menerima file <b>PDF</b>, maksimal 25MB per file. Bisa pilih beberapa file sekaligus.</p>
+        <div class="upload-zone" id="uploadZone">
+          <span class="icon">📄</span>
+          <p><b>Klik atau seret file PDF ke sini</b></p>
+          <p class="hint" id="uploadHint">Belum ada file dipilih</p>
+          <input type="file" id="fileInput" accept="application/pdf,.pdf" hidden multiple>
+        </div>
+        <div class="grid" style="margin-top:16px">
+          <div class="field">
+            <label>Nama Depo <span class="hint">(opsional)</span></label>
+            <input type="text" id="upDepo" list="listDepo2" placeholder="Ketik atau pilih depo">
+            <datalist id="listDepo2">
+              <option value="Gudang Farmasi">
+              <option value="Depo Farmasi Terpadu">
+              <option value="Depo Farmasi Rawat Inap">
+              <option value="Depo Farmasi IGD &amp; IBS">
+              <option value="Depo Farmasi Onkologi Terpadu">
+            </datalist>
+          </div>
+          <div class="field">
+            <label>Tanggal Rapat <span class="hint">(opsional)</span></label>
+            <input type="date" id="upTanggal">
+          </div>
+          <div class="field full">
+            <label>Keterangan <span class="hint">(opsional)</span></label>
+            <input type="text" id="upKeterangan" placeholder="Contoh: Hasil rapat evaluasi peresepan">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="doUpload()">📤 Upload Berkas</button>
+          <button class="btn btn-ghost" onclick="resetUploadForm()">↺ Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📁 Berkas Terunggah</h3>
+        <p class="sub">Daftar berkas hasil rapat yang sudah diunggah.</p>
+        <div id="fileList"><div class="empty"><p>Memuat…</p></div></div>
+      </div>
+    </section>
+
+    <!-- TEMPLATE -->
+    <section class="page" id="page-template">
+      <div class="topbar">
+        <div><h2>Download Template</h2><p>Unduh format dokumen untuk setiap depo farmasi</p></div>
+      </div>
+      <div class="card">
+        <div class="tpl-grid">
+          <div class="tpl-card">
+            <div class="tpl-icon">📄</div>
+            <h4>Template Undangan Rapat</h4>
+            <p>Format surat undangan rapat resmi dengan kop surat, siap diedit di Microsoft Word.</p>
+            <button class="btn btn-primary btn-sm" onclick="downloadTemplateUndangan()">⬇ Download (.doc)</button>
+          </div>
+          <div class="tpl-card">
+            <div class="tpl-icon">📝</div>
+            <h4>Template Notulen Rapat</h4>
+            <p>Format catatan hasil rapat: peserta, agenda, pembahasan, dan kesimpulan.</p>
+            <button class="btn btn-primary btn-sm" onclick="downloadTemplateNotulen()">⬇ Download (.doc)</button>
+          </div>
+          <div class="tpl-card">
+            <div class="tpl-icon">🖊️</div>
+            <h4>Template Daftar Hadir</h4>
+            <p>Tabel daftar hadir peserta rapat dengan kolom nama, jabatan, dan tanda tangan.</p>
+            <button class="btn btn-primary btn-sm" onclick="downloadTemplateDaftarHadir()">⬇ Download (.doc)</button>
+          </div>
+          <div class="tpl-card">
+            <div class="tpl-icon">📦</div>
+            <h4>Paket Lengkap (.doc)</h4>
+            <p>Ketiga template di atas dalam satu file dokumen Word untuk kemudahan distribusi.</p>
+            <button class="btn btn-primary btn-sm" onclick="downloadTemplatePaket()">⬇ Download Semua</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUAT UNDANGAN -->
+    <section class="page" id="page-buat">
+      <div class="topbar">
+        <div><h2>Buat Undangan Rapat</h2><p>Isi data rapat, lalu preview dan cetak undangan</p></div>
+      </div>
+      <div class="card">
+        <h3>📝 Formulir Undangan</h3>
+        <p class="sub">Kolom bertanda <span style="color:var(--danger)">*</span> wajib diisi.</p>
+        <form id="formUndangan" onsubmit="return false">
+          <div class="grid">
+            <div class="field full">
+              <label>Nomor Undangan <span class="hint">(opsional)</span></label>
+              <input type="text" id="inNomor" placeholder="Contoh: 001/IF/UND/X/2026">
+            </div>
+            <div class="field">
+              <label>Tanggal Undangan <span class="req">*</span></label>
+              <input type="date" id="inTanggal" required>
+            </div>
+            <div class="field">
+              <label>Nama Depo Farmasi <span class="req">*</span></label>
+              <input type="text" id="inDepo" list="listDepo" placeholder="Ketik atau pilih depo" required>
+              <datalist id="listDepo">
+                <option value="Gudang Farmasi">
+                <option value="Depo Farmasi Terpadu">
+                <option value="Depo Farmasi Rawat Inap">
+                <option value="Depo Farmasi IGD &amp; IBS">
+                <option value="Depo Farmasi Onkologi Terpadu">
+              </datalist>
+            </div>
+            <div class="field full">
+              <label>Tempat / Ruangan <span class="req">*</span></label>
+              <input type="text" id="inTempat" placeholder="Contoh: Ruangan Depo Farmasi Terpadu" required>
+            </div>
+            <div class="field">
+              <label>Waktu Rapat <span class="req">*</span></label>
+              <input type="time" id="inWaktu" required>
+            </div>
+            <div class="field">
+              <label>Zona Waktu</label>
+              <select id="inZona">
+                <option value="WIB">WIB</option>
+                <option value="WITA" selected>WITA</option>
+                <option value="WIT">WIT</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label>Agenda / Pembahasan <span class="req">*</span></label>
+              <textarea id="inAgenda" placeholder="Contoh: Peresepan dan evaluasi pelayanan resep" required></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn btn-primary" onclick="previewUndangan()">👁️ Preview & Cetak</button>
+            <button type="button" class="btn btn-outline" onclick="simpanUndangan()">💾 Simpan ke Riwayat</button>
+            <button type="button" class="btn btn-ghost" onclick="resetForm()">↺ Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- KOP SURAT (PANEL LIPAT) -->
+      <div class="card">
+        <div class="collapse-head" id="kopHead" onclick="toggleKop()">
+          <h3>⚙️ Kop Surat &amp; Penandatangan</h3>
+          <span class="chev">▼</span>
+        </div>
+        <p class="sub" style="margin-bottom:0">Data ini dipakai pada setiap undangan yang dicetak. Klik untuk membuka/menutup.</p>
+        <div class="collapse-body" id="kopBody">
+          <form id="formSettings" onsubmit="return false">
+            <div class="grid">
+              <div class="field full"><label>Nama Rumah Sakit / Instansi</label><input id="setNamaRS"></div>
+              <div class="field full"><label>Alamat</label><input id="setAlamat"></div>
+              <div class="field"><label>No. Telepon</label><input id="setTelp"></div>
+              <div class="field"><label>Kota</label><input id="setKota"></div>
+              <div class="field"><label>Jabatan Penandatangan</label><input id="setJabatan"></div>
+              <div class="field"><label>Nama Penandatangan</label><input id="setPenandatangan"></div>
+              <div class="field full"><label>NIP</label><input id="setNip"></div>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" onclick="simpanSettings()">💾 Simpan</button>
+              <button type="button" class="btn btn-ghost" onclick="loadSettingsToForm()">↺ Muat Ulang</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIWAYAT -->
+    <section class="page" id="page-riwayat">
+      <div class="topbar">
+        <div><h2>Riwayat Undangan</h2><p>Daftar undangan yang telah dibuat</p></div>
+        <button class="btn btn-danger btn-sm" onclick="hapusSemuaRiwayat()">🗑️ Hapus Semua</button>
+      </div>
+      <div class="card" id="riwayatCard">
+        <div id="riwayatList"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>👁️ Preview Undangan</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="cetakSekarang()">🖨️ Cetak</button>
+        <button class="icon-btn" onclick="tutupPreview()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body"><div class="paper" id="previewPaper"></div></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+/* ============ DATA & KONFIGURASI ============ */
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+const DEFAULT_SETTINGS = {
+  namaRS:'RUMAH SAKIT UMUM DAERAH',
+  alamat:'Jl. Kesehatan No. 123, Kota Anda',
+  telp:'(0511) 1234567',
+  kota:'Kota Anda',
+  jabatan:'Kepala Instalasi Farmasi',
+  penandatangan:'apt. Nama Apoteker, S.Farm.',
+  nip:'19800101 200501 1 001'
+};
+
+let settings = loadSettings();
+let riwayat = loadRiwayat();
+let currentLetterHTML = '';
+let pendingFiles = [];
+
+/* ============ UTIL ============ */
+function toast(msg,type='success'){
+  const t=document.createElement('div');
+  t.className='toast '+type; t.textContent=msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350)},3200);
+}
+function hariName(dateStr){
+  const [y,m,d]=dateStr.split('-').map(Number);
+  return HARI[new Date(y,m-1,d).getDay()];
+}
+function formatTanggal(dateStr){
+  if(!dateStr) return '-';
+  const [y,m,d]=dateStr.split('-').map(Number);
+  return `${d} ${BULAN[m-1]} ${y}`;
+}
+function formatWaktu(t){
+  if(!t) return '-';
+  return t.replace(':','.');
+}
+function formatSize(bytes){
+  if(!bytes) return '0 B';
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1024/1024).toFixed(2) + ' MB';
+}
+function formatTanggalWaktu(iso){
+  if(!iso) return '-';
+  try{
+    const d = new Date(iso);
+    return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){ return iso; }
+}
+function escapeHtml(s){
+  return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============ LOCALSTORAGE (undangan & settings) ============ */
+function loadSettings(){
+  try{ return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem('sirapat_settings')||'{}')); }
+  catch(e){ return {...DEFAULT_SETTINGS}; }
+}
+function saveSettings(){ localStorage.setItem('sirapat_settings', JSON.stringify(settings)); }
+function loadRiwayat(){
+  try{ return JSON.parse(localStorage.getItem('sirapat_riwayat')||'[]'); }
+  catch(e){ return []; }
+}
+function saveRiwayat(){ localStorage.setItem('sirapat_riwayat', JSON.stringify(riwayat)); }
+
+/* ============ INDEXEDDB (berkas PDF) ============ */
+const DB_NAME = 'sirapat_db';
+const STORE = 'berkas';
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded = e=>{
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(STORE)){
+        db.createObjectStore(STORE,{keyPath:'id'});
+      }
+    };
+    req.onsuccess = e=>resolve(e.target.result);
+    req.onerror = e=>reject(e.target.error);
+  });
+}
+async function dbAdd(item){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put(item);
+    tx.oncomplete = ()=>resolve(item);
+    tx.onerror = e=>reject(e.target.error);
+  });
+}
+async function dbGetAll(){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE,'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = ()=>resolve(req.result||[]);
+    req.onerror = e=>reject(e.target.error);
+  });
+}
+async function dbDelete(id){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = e=>reject(e.target.error);
+  });
+}
+
+/* ============ NAVIGASI ============ */
+function goPage(name){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='page-'+name));
+  document.getElementById('sidebar').classList.remove('open');
+  if(name==='riwayat') renderRiwayat();
+  if(name==='upload') { renderUploadedFiles(); updateUploadStats(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>goPage(b.dataset.page)));
+
+/* ============ PANEL KOP ============ */
+function toggleKop(){
+  document.getElementById('kopBody').classList.toggle('open');
+  document.getElementById('kopHead').classList.toggle('open');
+}
+
+/* ============ UPLOAD BERKAS PDF ============ */
+function setupUploadZone(){
+  const zone = document.getElementById('uploadZone');
+  const input = document.getElementById('fileInput');
+
+  zone.addEventListener('click', ()=>input.click());
+  zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', ()=>zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e=>{
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    handleSelectedFiles(e.dataTransfer.files);
+  });
+  input.addEventListener('change', e=>handleSelectedFiles(e.target.files));
+}
+
+function handleSelectedFiles(files){
+  const valid = [];
+  const MAX = 25*1024*1024;
+  for(const f of files){
+    const isPdf = f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
+    if(!isPdf){ toast('Bukan PDF: '+f.name,'error'); continue; }
+    if(f.size > MAX){ toast('Melebihi 25MB: '+f.name,'error'); continue; }
+    valid.push(f);
+  }
+  pendingFiles = valid;
+  const hint = document.getElementById('uploadHint');
+  if(valid.length){
+    hint.innerHTML = `<b>${valid.length} file</b> siap diunggah: ${valid.map(f=>escapeHtml(f.name)).join(', ')}`;
+  } else {
+    hint.textContent = 'Belum ada file dipilih';
+  }
+}
+
+function resetUploadForm(){
+  pendingFiles = [];
+  document.getElementById('fileInput').value = '';
+  document.getElementById('upDepo').value = '';
+  document.getElementById('upTanggal').value = '';
+  document.getElementById('upKeterangan').value = '';
+  document.getElementById('uploadHint').textContent = 'Belum ada file dipilih';
+}
+
+async function doUpload(){
+  if(!pendingFiles.length){ toast('Pilih file PDF terlebih dahulu','error'); return; }
+  const depo = document.getElementById('upDepo').value.trim();
+  const tanggal = document.getElementById('upTanggal').value;
+  const keterangan = document.getElementById('upKeterangan').value.trim();
+
+  let ok = 0, fail = 0;
+  for(const file of pendingFiles){
+    const item = {
+      id: 'pdf_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      name: file.name,
+      size: file.size,
+      type: 'application/pdf',
+      blob: file,
+      depo, tanggal, keterangan,
+      uploadedAt: new Date().toISOString()
+    };
+    try{
+      await dbAdd(item);
+      ok++;
+    }catch(e){
+      fail++;
+      toast('Gagal upload: '+file.name+' — '+e.message,'error');
+    }
+  }
+  if(ok) toast(ok+' berkas berhasil diunggah','success');
+  if(fail) toast(fail+' berkas gagal diunggah','error');
+  resetUploadForm();
+  await renderUploadedFiles();
+  updateUploadStats();
+}
+
+async function renderUploadedFiles(){
+  const list = document.getElementById('fileList');
+  try{
+    const files = await dbGetAll();
+    files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
+
+    if(!files.length){
+      list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada berkas terunggah.</p><p style="margin-top:8px;font-size:12px">Unggah berkas hasil rapat pada form di atas.</p></div>`;
+      return;
+    }
+
+    list.innerHTML = files.map(f=>`
+      <div class="file-item">
+        <div class="file-icon">📄</div>
+        <div class="file-main">
+          <h4>${escapeHtml(f.name)}</h4>
+          <p>
+            ${f.depo ? '🏥 '+escapeHtml(f.depo)+' &nbsp;·&nbsp; ' : ''}
+            ${f.tanggal ? '📅 '+formatTanggal(f.tanggal)+' &nbsp;·&nbsp; ' : ''}
+            💾 ${formatSize(f.size)} &nbsp;·&nbsp; ⬆ ${formatTanggalWaktu(f.uploadedAt)}
+          </p>
+          ${f.keterangan ? `<p class="ket">📝 ${escapeHtml(f.keterangan)}</p>` : ''}
+        </div>
+        <div class="file-actions">
+          <button class="btn btn-outline btn-sm" onclick="previewFile('${f.id}')">👁️ Buka</button>
+          <button class="btn btn-primary btn-sm" onclick="downloadFile('${f.id}')">⬇ Unduh</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){
+    list.innerHTML = `<div class="empty"><p>Gagal memuat berkas: ${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+async function updateUploadStats(){
+  try{
+    const files = await dbGetAll();
+    document.getElementById('upStatTotal').textContent = files.length;
+    const now = new Date();
+    const bln = files.filter(f=>{
+      const d = new Date(f.uploadedAt);
+      return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+    }).length;
+    document.getElementById('upStatBulan').textContent = bln;
+    const totalBytes = files.reduce((s,f)=>s+(f.size||0),0);
+    document.getElementById('upStatSize').textContent = formatSize(totalBytes);
+  }catch(e){ /* ignore */ }
+}
+
+async function previewFile(id){
+  try{
+    const files = await dbGetAll();
+    const f = files.find(x=>x.id===id);
+    if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
+    const url = URL.createObjectURL(f.blob);
+    window.open(url, '_blank');
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  }catch(e){ toast('Gagal membuka berkas: '+e.message,'error'); }
+}
+
+async function downloadFile(id){
+  try{
+    const files = await dbGetAll();
+    const f = files.find(x=>x.id===id);
+    if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
+    const url = URL.createObjectURL(f.blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = f.name || 'berkas.pdf';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    toast('Mengunduh: '+f.name,'success');
+  }catch(e){ toast('Gagal mengunduh: '+e.message,'error'); }
+}
+
+async function deleteFile(id){
+  if(!confirm('Hapus berkas ini?')) return;
+  try{
+    await dbDelete(id);
+    toast('Berkas dihapus','success');
+    await renderUploadedFiles();
+    updateUploadStats();
+  }catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
+}
+
+/* ============ FORM UNDANGAN ============ */
+function getFormData(){
+  return {
+    nomor: document.getElementById('inNomor').value.trim(),
+    tanggal: document.getElementById('inTanggal').value,
+    depo: document.getElementById('inDepo').value.trim(),
+    tempat: document.getElementById('inTempat').value.trim(),
+    waktu: document.getElementById('inWaktu').value,
+    zona: document.getElementById('inZona').value,
+    agenda: document.getElementById('inAgenda').value.trim()
+  };
+}
+function validateForm(d){
+  if(!d.tanggal) return 'Tanggal undangan wajib diisi.';
+  if(!d.depo) return 'Nama depo farmasi wajib diisi.';
+  if(!d.tempat) return 'Tempat rapat wajib diisi.';
+  if(!d.waktu) return 'Waktu rapat wajib diisi.';
+  if(!d.agenda) return 'Agenda rapat wajib diisi.';
+  return null;
+}
+function resetForm(){
+  document.getElementById('formUndangan').reset();
+  setDefaultFormValues();
+  toast('Formulir direset','success');
+}
+function setDefaultFormValues(){
+  const t = new Date();
+  const iso = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  document.getElementById('inTanggal').value = iso;
+  document.getElementById('inWaktu').value = '14:00';
+  document.getElementById('inZona').value = 'WITA';
+}
+
+/* ============ BUILD LETTER ============ */
+function buildLetter(d, s){
+  const tgl = formatTanggal(d.tanggal);
+  const hari = d.tanggal ? hariName(d.tanggal) : '-';
+  const waktu = formatWaktu(d.waktu) + ' ' + d.zona;
+  return `
+    <div class="letter">
+      <div class="kop">
+        <div class="logo">⚕️</div>
+        <div class="kop-text">
+          <h2>${escapeHtml(s.namaRS)}</h2>
+          <h3>INSTALASI FARMASI</h3>
+          <p>${escapeHtml(s.alamat)}${s.telp ? ' &nbsp;|&nbsp; Telp. '+escapeHtml(s.telp) : ''}</p>
+        </div>
+      </div>
+      <div class="kop-line"></div>
+      <div class="title">
+        <h3>UNDANGAN RAPAT</h3>
+        <p>Nomor: ${escapeHtml(d.nomor || '-')}</p>
+      </div>
+      <div style="margin-top:26px">
+        <p>Kepada Yth,</p>
+        <p><strong>Seluruh Staf ${escapeHtml(d.depo)}</strong></p>
+        <p>di Tempat</p>
+      </div>
+      <p class="body-text" style="margin-top:16px">Dengan hormat,</p>
+      <p class="body-text">Sehubungan dengan akan dilaksanakannya rapat koordinasi internal, dengan ini kami mengundang Bapak/Ibu/Saudara untuk hadir pada:</p>
+      <div class="meta">
+        <table>
+          <tr><td>Hari / Tanggal</td><td>:</td><td><strong>${hari}, ${tgl}</strong></td></tr>
+          <tr><td>Waktu</td><td>:</td><td>${waktu}</td></tr>
+          <tr><td>Tempat</td><td>:</td><td>${escapeHtml(d.tempat)}</td></tr>
+          <tr><td>Agenda</td><td>:</td><td>${escapeHtml(d.agenda)}</td></tr>
+        </table>
+      </div>
+      <p class="body-text">Demikian undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, kami mengharapkan kehadiran Bapak/Ibu/Saudara tepat pada waktunya.</p>
+      <p class="body-text">Atas perhatian dan kehadirannya, kami ucapkan terima kasih.</p>
+      <div class="ttd">
+        <div class="ttd-inner">
+          <p>${escapeHtml(s.kota)}, ${tgl}</p>
+          <p>${escapeHtml(s.jabatan)}</p>
+          <div class="space"></div>
+          <p class="name">${escapeHtml(s.penandatangan)}</p>
+          <p>NIP. ${escapeHtml(s.nip)}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ PREVIEW & CETAK ============ */
+function previewUndangan(){
+  const d = getFormData();
+  const err = validateForm(d);
+  if(err){ toast(err,'error'); return; }
+  currentLetterHTML = buildLetter(d, settings);
+  document.getElementById('previewPaper').innerHTML = currentLetterHTML;
+  document.getElementById('previewModal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function tutupPreview(){
+  document.getElementById('previewModal').classList.remove('show');
+  document.body.style.overflow='';
+}
+function cetakSekarang(){
+  if(!currentLetterHTML){ toast('Tidak ada undangan untuk dicetak','error'); return; }
+  document.getElementById('printArea').innerHTML = currentLetterHTML;
+  setTimeout(()=>window.print(), 150);
+}
+function cetakDariRiwayat(id){
+  const item = riwayat.find(r=>r.id===id);
+  if(!item) return;
+  currentLetterHTML = buildLetter(item, settings);
+  document.getElementById('printArea').innerHTML = currentLetterHTML;
+  setTimeout(()=>window.print(), 150);
+}
+function previewDariRiwayat(id){
+  const item = riwayat.find(r=>r.id===id);
+  if(!item) return;
+  currentLetterHTML = buildLetter(item, settings);
+  document.getElementById('previewPaper').innerHTML = currentLetterHTML;
+  document.getElementById('previewModal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+document.getElementById('previewModal').addEventListener('click',e=>{
+  if(e.target.id==='previewModal') tutupPreview();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') tutupPreview(); });
+
+/* ============ SIMPAN RIWAYAT ============ */
+function simpanUndangan(){
+  const d = getFormData();
+  const err = validateForm(d);
+  if(err){ toast(err,'error'); return; }
+  const item = Object.assign({}, d, {
+    id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    createdAt: new Date().toISOString()
+  });
+  riwayat.unshift(item);
+  saveRiwayat();
+  renderRiwayat();
+  toast('Undangan berhasil disimpan ke riwayat','success');
+}
+
+/* ============ RENDER RIWAYAT ============ */
+function renderRiwayat(){
+  const list = document.getElementById('riwayatList');
+  if(!riwayat.length){
+    list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada undangan tersimpan.</p><p style="margin-top:8px;font-size:12px">Buat undangan di menu <b>Buat Undangan</b>.</p></div>`;
+    return;
+  }
+  list.innerHTML = riwayat.map(r=>`
+    <div class="history-item">
+      <div class="hi-main">
+        <h4>${escapeHtml(r.depo)} <span class="badge">${formatTanggal(r.tanggal)}</span></h4>
+        <p>🕐 ${formatWaktu(r.waktu)} ${r.zona} &nbsp;•&nbsp; 📍 ${escapeHtml(r.tempat)}</p>
+        <p>📋 ${escapeHtml(r.agenda)}</p>
+      </div>
+      <div class="hi-actions">
+        <button class="btn btn-outline btn-sm" onclick="previewDariRiwayat('${r.id}')">👁️ Preview</button>
+        <button class="btn btn-primary btn-sm" onclick="cetakDariRiwayat('${r.id}')">🖨️ Cetak</button>
+        <button class="btn btn-danger btn-sm" onclick="hapusRiwayat('${r.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+function hapusRiwayat(id){
+  if(!confirm('Hapus undangan ini dari riwayat?')) return;
+  riwayat = riwayat.filter(r=>r.id!==id);
+  saveRiwayat(); renderRiwayat();
+  toast('Undangan dihapus','success');
+}
+function hapusSemuaRiwayat(){
+  if(!riwayat.length){ toast('Riwayat masih kosong','error'); return; }
+  if(!confirm('Hapus SEMUA riwayat undangan? Tindakan ini tidak dapat dibatalkan.')) return;
+  riwayat = []; saveRiwayat(); renderRiwayat();
+  toast('Semua riwayat dihapus','success');
+}
+
+/* ============ KOP SURAT ============ */
+function loadSettingsToForm(){
+  document.getElementById('setNamaRS').value = settings.namaRS;
+  document.getElementById('setAlamat').value = settings.alamat;
+  document.getElementById('setTelp').value = settings.telp;
+  document.getElementById('setKota').value = settings.kota;
+  document.getElementById('setJabatan').value = settings.jabatan;
+  document.getElementById('setPenandatangan').value = settings.penandatangan;
+  document.getElementById('setNip').value = settings.nip;
+}
+function simpanSettings(){
+  settings = {
+    namaRS: document.getElementById('setNamaRS').value.trim() || DEFAULT_SETTINGS.namaRS,
+    alamat: document.getElementById('setAlamat').value.trim(),
+    telp: document.getElementById('setTelp').value.trim(),
+    kota: document.getElementById('setKota').value.trim(),
+    jabatan: document.getElementById('setJabatan').value.trim(),
+    penandatangan: document.getElementById('setPenandatangan').value.trim(),
+    nip: document.getElementById('setNip').value.trim()
+  };
+  saveSettings();
+  toast('Kop surat disimpan','success');
+}
+
+/* ============ DOWNLOAD WORD ============ */
+function downloadWord(filename, bodyHTML){
+  const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  <head><meta charset='utf-8'><title>Document</title>
+  <style>
+    body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.5}
+    table{border-collapse:collapse;width:100%}
+    td,th{padding:6px 8px;vertical-align:top}
+    .kop{text-align:center;border-bottom:3px double #000;padding-bottom:10px;margin-bottom:20px}
+    .kop h2{font-size:16pt;margin:0}
+    .kop h3{font-size:11pt;font-weight:normal;margin:2px 0}
+    .kop p{font-size:9pt;margin:2px 0}
+    .title{text-align:center;margin:22px 0 8px}
+    .title h3{font-size:14pt;text-decoration:underline;margin:0}
+    .title p{font-size:11pt;margin:4px 0 0}
+    .meta td{padding:3px 6px 3px 0}
+    .meta td:first-child{width:130px}
+    .ttd{margin-top:60px;text-align:right}
+    .ttd .inner{display:inline-block;text-align:center;min-width:220px}
+    .space{height:70px}
+    .name{font-weight:bold;text-decoration:underline}
+    table.data,table.data th,table.data td{border:1px solid #000}
+    table.data th{background:#e0e0e0;text-align:center}
+    .box{border:1px solid #000;padding:10px;min-height:70px}
+    ul,ol{margin:6px 0 6px 20px}
+  </style></head><body>`;
+  const blob = new Blob(['\ufeff', header + bodyHTML + '</body></html>'], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Template berhasil diunduh: ' + filename, 'success');
+}
+
+function kopHTML(s){
+  return `<div class="kop"><h2>${escapeHtml(s.namaRS)}</h2><h3>INSTALASI FARMASI</h3><p>${escapeHtml(s.alamat)}${s.telp?' | Telp. '+escapeHtml(s.telp):''}</p></div>`;
+}
+
+function downloadTemplateUndangan(){
+  const s = settings;
+  const body = `
+    ${kopHTML(s)}
+    <div class="title"><h3>UNDANGAN RAPAT</h3><p>Nomor: ..................../IF/UND/......../........</p></div>
+    <p style="margin-top:20px">Kepada Yth,</p>
+    <p><b>Seluruh Staf Depo Farmasi ..............................</b></p>
+    <p>di Tempat</p>
+    <p style="margin-top:14px;text-align:justify">Dengan hormat,</p>
+    <p style="text-align:justify">Sehubungan dengan akan dilaksanakannya rapat koordinasi internal, dengan ini kami mengundang Bapak/Ibu/Saudara untuk hadir pada:</p>
+    <table class="meta" style="margin-left:20px;margin-top:10px">
+      <tr><td>Hari / Tanggal</td><td>:</td><td><b>............................</b></td></tr>
+      <tr><td>Waktu</td><td>:</td><td>............................</td></tr>
+      <tr><td>Tempat</td><td>:</td><td>............................</td></tr>
+      <tr><td>Agenda</td><td>:</td><td>............................</td></tr>
+    </table>
+    <p style="text-align:justify;margin-top:14px">Demikian undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, kami mengharapkan kehadiran Bapak/Ibu/Saudara tepat pada waktunya.</p>
+    <p style="text-align:justify">Atas perhatian dan kehadirannya, kami ucapkan terima kasih.</p>
+    <div class="ttd"><div class="inner">
+      <p>${escapeHtml(s.kota)}, ............................</p>
+      <p>${escapeHtml(s.jabatan)}</p>
+      <div class="space"></div>
+      <p class="name">${escapeHtml(s.penandatangan)}</p>
+      <p>NIP. ${escapeHtml(s.nip)}</p>
+    </div></div>
+  `;
+  downloadWord('Template_Undangan_Rapat_Depo_Farmasi.doc', body);
+}
+
+function downloadTemplateNotulen(){
+  const s = settings;
+  const body = `
+    ${kopHTML(s)}
+    <div class="title"><h3>NOTULEN RAPAT</h3><p>Nomor: ..................../IF/NOT/......../........</p></div>
+    <table class="meta" style="margin-top:20px">
+      <tr><td>Hari / Tanggal</td><td>:</td><td>............................</td></tr>
+      <tr><td>Waktu</td><td>:</td><td>............................</td></tr>
+      <tr><td>Tempat</td><td>:</td><td>............................</td></tr>
+      <tr><td>Depo Farmasi</td><td>:</td><td>............................</td></tr>
+      <tr><td>Pemimpin Rapat</td><td>:</td><td>............................</td></tr>
+      <tr><td>Notulis</td><td>:</td><td>............................</td></tr>
+    </table>
+    <p style="margin-top:20px"><b>A. PESERTA RAPAT</b></p>
+    <table class="data">
+      <tr><th style="width:40px">No</th><th>Nama</th><th>Jabatan</th><th>Tanda Tangan</th></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+    </table>
+    <p style="margin-top:20px"><b>B. AGENDA RAPAT</b></p>
+    <div class="box">................................................................................</div>
+    <p style="margin-top:16px"><b>C. PEMBAHASAN</b></p>
+    <div class="box" style="min-height:150px">................................................................................</div>
+    <p style="margin-top:16px"><b>D. KESIMPULAN / KEPUTUSAN</b></p>
+    <div class="box" style="min-height:110px">................................................................................</div>
+    <p style="margin-top:16px"><b>E. RENCANA TINDAK LANJUT</b></p>
+    <table class="data">
+      <tr><th style="width:40px">No</th><th>Kegiatan</th><th>PIC</th><th>Target Waktu</th></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+    </table>
+    <div class="ttd"><div class="inner">
+      <p>${escapeHtml(s.kota)}, ............................</p>
+      <p>Notulis</p>
+      <div class="space"></div>
+      <p class="name">............................</p>
+      <p>NIP. ............................</p>
+    </div></div>
+  `;
+  downloadWord('Template_Notulen_Rapat_Depo_Farmasi.doc', body);
+}
+
+function downloadTemplateDaftarHadir(){
+  const s = settings;
+  const body = `
+    ${kopHTML(s)}
+    <div class="title"><h3>DAFTAR HADIR RAPAT</h3><p>Depo Farmasi: ............................</p></div>
+    <table class="meta" style="margin-top:16px">
+      <tr><td>Hari / Tanggal</td><td>:</td><td>............................</td></tr>
+      <tr><td>Waktu</td><td>:</td><td>............................</td></tr>
+      <tr><td>Tempat</td><td>:</td><td>............................</td></tr>
+      <tr><td>Agenda</td><td>:</td><td>............................</td></tr>
+    </table>
+    <table class="data" style="margin-top:20px">
+      <tr><th style="width:40px">No</th><th>Nama Lengkap</th><th>Jabatan</th><th>Tanda Tangan</th></tr>
+      ${Array.from({length:15}).map((_,i)=>`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td></tr>`).join('')}
+    </table>
+    <div class="ttd"><div class="inner">
+      <p>${escapeHtml(s.kota)}, ............................</p>
+      <p>${escapeHtml(s.jabatan)}</p>
+      <div class="space"></div>
+      <p class="name">${escapeHtml(s.penandatangan)}</p>
+      <p>NIP. ${escapeHtml(s.nip)}</p>
+    </div></div>
+  `;
+  downloadWord('Template_Daftar_Hadir_Rapat_Depo_Farmasi.doc', body);
+}
+
+function downloadTemplatePaket(){
+  const s = settings;
+  const body = `
+    <div style="page-break-after:always">${buildTemplateUndanganStr(s)}</div>
+    <div style="page-break-after:always">${buildTemplateNotulenStr(s)}</div>
+    <div>${buildTemplateDaftarHadirStr(s)}</div>
+  `;
+  downloadWord('Paket_Template_Rapat_Depo_Farmasi.doc', body);
+}
+
+function buildTemplateUndanganStr(s){
+  return `${kopHTML(s)}
+    <div class="title"><h3>UNDANGAN RAPAT</h3><p>Nomor: ..../IF/UND/..../....</p></div>
+    <p style="margin-top:20px">Kepada Yth,</p>
+    <p><b>Seluruh Staf Depo Farmasi ..............................</b></p>
+    <p>di Tempat</p>
+    <p style="margin-top:14px">Dengan hormat,</p>
+    <p style="text-align:justify">Sehubungan dengan akan dilaksanakannya rapat koordinasi internal, dengan ini kami mengundang Bapak/Ibu/Saudara untuk hadir pada:</p>
+    <table class="meta" style="margin-left:20px">
+      <tr><td>Hari / Tanggal</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Waktu</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Tempat</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Agenda</td><td>:</td><td>...........................</td></tr>
+    </table>
+    <p style="text-align:justify;margin-top:14px">Demikian undangan ini kami sampaikan. Atas perhatian dan kehadirannya kami ucapkan terima kasih.</p>
+    <div class="ttd"><div class="inner">
+      <p>${escapeHtml(s.kota)}, ...........................</p><p>${escapeHtml(s.jabatan)}</p>
+      <div class="space"></div><p class="name">${escapeHtml(s.penandatangan)}</p><p>NIP. ${escapeHtml(s.nip)}</p>
+    </div></div>`;
+}
+function buildTemplateNotulenStr(s){
+  return `${kopHTML(s)}
+    <div class="title"><h3>NOTULEN RAPAT</h3></div>
+    <table class="meta" style="margin-top:16px">
+      <tr><td>Hari / Tanggal</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Waktu</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Tempat</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Depo</td><td>:</td><td>...........................</td></tr>
+    </table>
+    <p style="margin-top:16px"><b>A. PESERTA</b></p>
+    <table class="data"><tr><th style="width:40px">No</th><th>Nama</th><th>Jabatan</th><th>TTD</th></tr>
+    ${Array.from({length:6}).map((_,i)=>`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td></tr>`).join('')}</table>
+    <p style="margin-top:16px"><b>B. AGENDA</b></p><div class="box"></div>
+    <p style="margin-top:16px"><b>C. PEMBAHASAN</b></p><div class="box" style="min-height:130px"></div>
+    <p style="margin-top:16px"><b>D. KESIMPULAN</b></p><div class="box" style="min-height:90px"></div>`;
+}
+function buildTemplateDaftarHadirStr(s){
+  return `${kopHTML(s)}
+    <div class="title"><h3>DAFTAR HADIR RAPAT</h3><p>Depo Farmasi: ...........................</p></div>
+    <table class="meta" style="margin-top:16px">
+      <tr><td>Hari / Tanggal</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Waktu</td><td>:</td><td>...........................</td></tr>
+      <tr><td>Tempat</td><td>:</td><td>...........................</td></tr>
+    </table>
+    <table class="data" style="margin-top:16px">
+      <tr><th style="width:40px">No</th><th>Nama</th><th>Jabatan</th><th>TTD</th></tr>
+      ${Array.from({length:15}).map((_,i)=>`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td></tr>`).join('')}
+    </table>`;
+}
+
+/* ============ INIT ============ */
+(function init(){
+  setDefaultFormValues();
+  loadSettingsToForm();
+  renderRiwayat();
+  setupUploadZone();
+  renderUploadedFiles();
+  updateUploadStats();
+})();
+</script>
+</body>
+</html>
