@@ -535,7 +535,7 @@ function showRoleSelection() {
 function loginAsDepo() {
   currentUser = { name: 'Admin Depo', role: 'admin_depo' };
   localStorage.setItem('sirapat_user', JSON.stringify(currentUser));
-  initApp();
+  transitionToApp();
 }
 function doLogin(){
   const u = document.getElementById('loginUser').value.trim();
@@ -549,21 +549,27 @@ function doLogin(){
   }
   err.style.display = 'none';
   localStorage.setItem('sirapat_user', JSON.stringify(currentUser));
-  initApp();
+  transitionToApp();
 }
 function doLogout(){
   localStorage.removeItem('sirapat_user');
   location.reload();
 }
+
+// Fungsi pembantu transisi layar yang mulus
+function transitionToApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  initApp();
+}
+
 function checkAuth(){
   const saved = localStorage.getItem('sirapat_user');
   if(saved){
     try { currentUser = JSON.parse(saved); } catch(e){}
   }
   if(currentUser){
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    initApp();
+    transitionToApp();
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('mainApp').style.display = 'none';
@@ -1291,12 +1297,10 @@ function simpanSettings(){
 }
 
 /* ============ INIT APLIKASI ============ */
-async function initApp(){
+function initApp(){
   renderMenus();
   
-  // Muat data terbaru dari Google Sheets saat aplikasi dibuka
-  await loadFromGoogleSheet();
-  
+  // Render UI Lokal terlebih dahulu agar menu langsung muncul
   goPage('upload');
   setDefaultFormValues();
   loadSettingsToForm();
@@ -1305,6 +1309,9 @@ async function initApp(){
   updateUploadStats();
   initMonFilter();
   renderTemplates();
+
+  // Tarik data dari Google Sheets secara background (tanpa memblokir UI)
+  loadFromGoogleSheet();
 }
 
 window.addEventListener('DOMContentLoaded', checkAuth);
