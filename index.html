@@ -132,7 +132,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .mon-detail{font-size:12.5px;color:#475569;line-height:1.65}
 .mon-detail .line{display:block;margin-top:2px}
 .mon-sub{font-size:11.5px;color:var(--muted);margin-top:6px}
-.mon-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
 
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty .icon{font-size:48px;opacity:.3;margin-bottom:10px;display:block}
@@ -196,7 +195,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   .menu-toggle{display:flex}
   .modal-body .paper{padding:26px 22px}
   .mon-card{flex-direction:column;align-items:flex-start}
-  .mon-actions{width:100%}
 }
 </style>
 </head>
@@ -212,7 +210,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       <button class="nav-item active" data-page="upload"><span class="icon">📤</span> Upload Hasil Rapat</button>
       <button class="nav-item" data-page="monitoring"><span class="icon">📊</span> Monitoring Bulanan</button>
       <button class="nav-item" data-page="template"><span class="icon">📥</span> Download Template</button>
-      <button class="nav-item" data-page="buat"><span class="icon">✍️</span> Buat Undangan</button>
       <button class="nav-item" data-page="riwayat"><span class="icon">📋</span> Riwayat Undangan</button>
     </nav>
   </aside>
@@ -345,10 +342,11 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- BUAT UNDANGAN -->
+    <!-- BUAT UNDANGAN (Halaman tetap ada, akses via Riwayat) -->
     <section class="page" id="page-buat">
       <div class="topbar">
         <div><h2>Buat Undangan Rapat</h2><p>Isi data rapat, lalu preview dan cetak undangan</p></div>
+        <button class="btn btn-ghost btn-sm" onclick="goPage('riwayat')">← Kembali ke Riwayat</button>
       </div>
       <div class="card">
         <h3>📝 Formulir Undangan</h3>
@@ -434,7 +432,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <section class="page" id="page-riwayat">
       <div class="topbar">
         <div><h2>Riwayat Undangan</h2><p>Daftar undangan yang telah dibuat</p></div>
-        <button class="btn btn-danger btn-sm" onclick="hapusSemuaRiwayat()">🗑️ Hapus Semua</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="goPage('buat')">✍️ Buat Undangan Baru</button>
+          <button class="btn btn-danger btn-sm" onclick="hapusSemuaRiwayat()">🗑️ Hapus Semua</button>
+        </div>
       </div>
       <div class="card" id="riwayatCard">
         <div id="riwayatList"></div>
@@ -849,7 +850,7 @@ async function renderMonitoring(){
   document.getElementById('monStatBelum').textContent = belum;
   document.getElementById('monStatPersen').textContent = Math.round(sudah/DEPO_LIST.length*100) + '%';
 
-  // Render list
+  // Render list (TANPA TOMBOL AKSI)
   const list = document.getElementById('monList');
   if(!data.length){
     list.innerHTML = `<div class="empty"><p>Tidak ada depo terdaftar.</p></div>`;
@@ -888,16 +889,6 @@ async function renderMonitoring(){
 
     const subInfo = (isSudah || isTerjadwal) ? `<p class="mon-sub">Undangan: ${d.undangan.length} · Hasil: ${d.hasil.length}</p>` : '';
 
-    // Actions
-    let actions = '';
-    if(isSudah){
-      actions = `<button class="btn btn-outline btn-sm" onclick="renderMonitoring()">🔄 Segarkan</button>`;
-    } else if(isTerjadwal){
-      actions = `<button class="btn btn-primary btn-sm" data-depo="${escapeHtml(d.depo)}" onclick="uploadHasilUntuk(this.dataset.depo)">📤 Upload Hasil</button>`;
-    } else {
-      actions = `<button class="btn btn-primary btn-sm" data-depo="${escapeHtml(d.depo)}" onclick="buatUndanganUntuk(this.dataset.depo)">✍️ Buat Undangan</button>`;
-    }
-
     return `
       <div class="mon-card mon-${d.status}">
         <div class="mon-icon">${icon}</div>
@@ -909,28 +900,9 @@ async function renderMonitoring(){
           <p class="mon-detail">${detail}</p>
           ${subInfo}
         </div>
-        <div class="mon-actions">${actions}</div>
       </div>
     `;
   }).join('');
-}
-
-function buatUndanganUntuk(depo){
-  document.getElementById('inDepo').value = depo;
-  goPage('buat');
-  setTimeout(()=>{
-    const el = document.getElementById('inTempat');
-    if(el) el.focus();
-  }, 120);
-}
-
-function uploadHasilUntuk(depo){
-  document.getElementById('upDepo').value = depo;
-  goPage('upload');
-  setTimeout(()=>{
-    const el = document.getElementById('uploadZone');
-    if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
-  }, 120);
 }
 
 /* ============ FORM UNDANGAN ============ */
@@ -1074,7 +1046,7 @@ function simpanUndangan(){
 function renderRiwayat(){
   const list = document.getElementById('riwayatList');
   if(!riwayat.length){
-    list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada undangan tersimpan.</p><p style="margin-top:8px;font-size:12px">Buat undangan di menu <b>Buat Undangan</b>.</p></div>`;
+    list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada undangan tersimpan.</p><p style="margin-top:8px;font-size:12px">Klik tombol <b>Buat Undangan Baru</b> di atas untuk memulai.</p></div>`;
     return;
   }
   list.innerHTML = riwayat.map(r=>`
