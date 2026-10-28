@@ -316,7 +316,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <!-- TEMPLATE (SUPERADMIN & ADMIN DEPO) -->
     <section class="page" id="page-template">
       <div class="topbar">
-        <div><h2>Download Template</h2><p>Unduh format dokumen untuk kegiatan rapat</p></div>
+        <div><h2>Download Template</h2><p>Unduh format dokumen yang telah disediakan oleh Superadmin</p></div>
       </div>
 
       <!-- UPLOAD TEMPLATE KHUSUS SUPERADMIN -->
@@ -346,7 +346,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
         <h3>📁 Daftar Template Tersedia</h3>
         <p class="sub">Silakan unduh template di bawah ini untuk digunakan.</p>
         <div class="tpl-grid" id="templateGrid">
-          <!-- Template akan di-render via JS -->
+          <!-- Template dari Superadmin akan di-render via JS -->
         </div>
       </div>
     </section>
@@ -753,30 +753,7 @@ async function uploadTemplate(){
 
 async function renderTemplates(){
   const grid = document.getElementById('templateGrid');
-  
-  // 1. Template Bawaan Sistem (HTML to Word)
-  const builtInTpls = `
-    <div class="tpl-card">
-      <div class="tpl-icon">📄</div>
-      <h4>Template Undangan Rapat</h4>
-      <p>Format surat undangan rapat resmi dengan kop surat, siap diedit di Microsoft Word.</p>
-      <button class="btn btn-primary btn-sm" onclick="downloadTemplateUndangan()">⬇ Download (.doc)</button>
-    </div>
-    <div class="tpl-card">
-      <div class="tpl-icon">📝</div>
-      <h4>Template Notulen Rapat</h4>
-      <p>Format catatan hasil rapat: peserta, agenda, pembahasan, dan kesimpulan.</p>
-      <button class="btn btn-primary btn-sm" onclick="downloadTemplateNotulen()">⬇ Download (.doc)</button>
-    </div>
-    <div class="tpl-card">
-      <div class="tpl-icon">🖊️</div>
-      <h4>Template Daftar Hadir</h4>
-      <p>Tabel daftar hadir peserta rapat dengan kolom nama, jabatan, dan tanda tangan.</p>
-      <button class="btn btn-primary btn-sm" onclick="downloadTemplateDaftarHadir()">⬇ Download (.doc)</button>
-    </div>
-  `;
 
-  // 2. Template Uploadan Superadmin (Dari IndexedDB)
   let uploadedHtml = '';
   try {
     const files = await dbGetAll(STORE_TEMPLATES);
@@ -794,10 +771,21 @@ async function renderTemplates(){
           </div>
         </div>
       `).join('');
+    } else {
+      uploadedHtml = `
+        <div class="empty" style="grid-column: 1 / -1; width: 100%;">
+          <span class="icon">📭</span>
+          <p>Belum ada template yang diunggah.</p>
+          ${currentUser.role === 'superadmin' ? '<p style="margin-top:8px;font-size:12px">Silakan unggah file template melalui form di atas.</p>' : '<p style="margin-top:8px;font-size:12px">Silakan hubungi Superadmin untuk mengunggah template.</p>'}
+        </div>
+      `;
     }
-  } catch(e) { console.error(e); }
+  } catch(e) { 
+    console.error(e); 
+    uploadedHtml = `<div class="empty"><p>Gagal memuat template.</p></div>`;
+  }
 
-  grid.innerHTML = builtInTpls + uploadedHtml;
+  grid.innerHTML = uploadedHtml;
 }
 
 async function downloadUploadedTemplate(id){
@@ -1312,146 +1300,6 @@ function simpanSettings(){
   };
   saveSettings();
   toast('Kop surat disimpan','success');
-}
-
-/* ============ DOWNLOAD WORD (DEFAULT TEMPLATES) ============ */
-function downloadWord(filename, bodyHTML){
-  const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-  <head><meta charset='utf-8'><title>Document</title>
-  <style>
-    body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.5}
-    table{border-collapse:collapse;width:100%}
-    td,th{padding:6px 8px;vertical-align:top}
-    .kop{text-align:center;border-bottom:3px double #000;padding-bottom:10px;margin-bottom:20px}
-    .kop h2{font-size:16pt;margin:0}
-    .kop h3{font-size:11pt;font-weight:normal;margin:2px 0}
-    .kop p{font-size:9pt;margin:2px 0}
-    .title{text-align:center;margin:22px 0 8px}
-    .title h3{font-size:14pt;text-decoration:underline;margin:0}
-    .title p{font-size:11pt;margin:4px 0 0}
-    .meta td{padding:3px 6px 3px 0}
-    .meta td:first-child{width:130px}
-    .ttd{margin-top:60px;text-align:right}
-    .ttd .inner{display:inline-block;text-align:center;min-width:220px}
-    .space{height:70px}
-    .name{font-weight:bold;text-decoration:underline}
-    table.data,table.data th,table.data td{border:1px solid #000}
-    table.data th{background:#e0e0e0;text-align:center}
-    .box{border:1px solid #000;padding:10px;min-height:70px}
-    ul,ol{margin:6px 0 6px 20px}
-  </style></head><body>`;
-  const blob = new Blob(['\ufeff', header + bodyHTML + '</body></html>'], {type:'application/msword'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('Template berhasil diunduh: ' + filename, 'success');
-}
-
-function kopHTML(s){
-  return `<div class="kop"><h2>${escapeHtml(s.namaRS)}</h2><h3>INSTALASI FARMASI</h3><p>${escapeHtml(s.alamat)}${s.telp?' | Telp. '+escapeHtml(s.telp):''}</p></div>`;
-}
-
-function downloadTemplateUndangan(){
-  const s = settings;
-  const body = `
-    ${kopHTML(s)}
-    <div class="title"><h3>UNDANGAN RAPAT</h3><p>Nomor: ..................../IF/UND/......../........</p></div>
-    <p style="margin-top:20px">Kepada Yth,</p>
-    <p><b>Seluruh Staf Depo Farmasi ..............................</b></p>
-    <p>di Tempat</p>
-    <p style="margin-top:14px;text-align:justify">Dengan hormat,</p>
-    <p style="text-align:justify">Sehubungan dengan akan dilaksanakannya rapat koordinasi internal, dengan ini kami mengundang Bapak/Ibu/Saudara untuk hadir pada:</p>
-    <table class="meta" style="margin-left:20px;margin-top:10px">
-      <tr><td>Hari / Tanggal</td><td>:</td><td><b>............................</b></td></tr>
-      <tr><td>Waktu</td><td>:</td><td>............................</td></tr>
-      <tr><td>Tempat</td><td>:</td><td>............................</td></tr>
-      <tr><td>Agenda</td><td>:</td><td>............................</td></tr>
-    </table>
-    <p style="text-align:justify;margin-top:14px">Demikian undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, kami mengharapkan kehadiran Bapak/Ibu/Saudara tepat pada waktunya.</p>
-    <p style="text-align:justify">Atas perhatian dan kehadirannya, kami ucapkan terima kasih.</p>
-    <div class="ttd"><div class="inner">
-      <p>${escapeHtml(s.kota)}, ............................</p>
-      <p>${escapeHtml(s.jabatan)}</p>
-      <div class="space"></div>
-      <p class="name">${escapeHtml(s.penandatangan)}</p>
-      <p>NIP. ${escapeHtml(s.nip)}</p>
-    </div></div>
-  `;
-  downloadWord('Template_Undangan_Rapat_Depo_Farmasi.doc', body);
-}
-
-function downloadTemplateNotulen(){
-  const s = settings;
-  const body = `
-    ${kopHTML(s)}
-    <div class="title"><h3>NOTULEN RAPAT</h3><p>Nomor: ..................../IF/NOT/......../........</p></div>
-    <table class="meta" style="margin-top:20px">
-      <tr><td>Hari / Tanggal</td><td>:</td><td>............................</td></tr>
-      <tr><td>Waktu</td><td>:</td><td>............................</td></tr>
-      <tr><td>Tempat</td><td>:</td><td>............................</td></tr>
-      <tr><td>Depo Farmasi</td><td>:</td><td>............................</td></tr>
-      <tr><td>Pemimpin Rapat</td><td>:</td><td>............................</td></tr>
-      <tr><td>Notulis</td><td>:</td><td>............................</td></tr>
-    </table>
-    <p style="margin-top:20px"><b>A. PESERTA RAPAT</b></p>
-    <table class="data">
-      <tr><th style="width:40px">No</th><th>Nama</th><th>Jabatan</th><th>Tanda Tangan</th></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-    </table>
-    <p style="margin-top:20px"><b>B. AGENDA RAPAT</b></p>
-    <div class="box">................................................................................</div>
-    <p style="margin-top:16px"><b>C. PEMBAHASAN</b></p>
-    <div class="box" style="min-height:150px">................................................................................</div>
-    <p style="margin-top:16px"><b>D. KESIMPULAN / KEPUTUSAN</b></p>
-    <div class="box" style="min-height:110px">................................................................................</div>
-    <p style="margin-top:16px"><b>E. RENCANA TINDAK LANJUT</b></p>
-    <table class="data">
-      <tr><th style="width:40px">No</th><th>Kegiatan</th><th>PIC</th><th>Target Waktu</th></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-      <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
-    </table>
-    <div class="ttd"><div class="inner">
-      <p>${escapeHtml(s.kota)}, ............................</p>
-      <p>Notulis</p>
-      <div class="space"></div>
-      <p class="name">............................</p>
-      <p>NIP. ............................</p>
-    </div></div>
-  `;
-  downloadWord('Template_Notulen_Rapat_Depo_Farmasi.doc', body);
-}
-
-function downloadTemplateDaftarHadir(){
-  const s = settings;
-  const body = `
-    ${kopHTML(s)}
-    <div class="title"><h3>DAFTAR HADIR RAPAT</h3><p>Depo Farmasi: ............................</p></div>
-    <table class="meta" style="margin-top:16px">
-      <tr><td>Hari / Tanggal</td><td>:</td><td>............................</td></tr>
-      <tr><td>Waktu</td><td>:</td><td>............................</td></tr>
-      <tr><td>Tempat</td><td>:</td><td>............................</td></tr>
-      <tr><td>Agenda</td><td>:</td><td>............................</td></tr>
-    </table>
-    <table class="data" style="margin-top:20px">
-      <tr><th style="width:40px">No</th><th>Nama Lengkap</th><th>Jabatan</th><th>Tanda Tangan</th></tr>
-      ${Array.from({length:15}).map((_,i)=>`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td></tr>`).join('')}
-    </table>
-    <div class="ttd"><div class="inner">
-      <p>${escapeHtml(s.kota)}, ............................</p>
-      <p>${escapeHtml(s.jabatan)}</p>
-      <div class="space"></div>
-      <p class="name">${escapeHtml(s.penandatangan)}</p>
-      <p>NIP. ${escapeHtml(s.nip)}</p>
-    </div></div>
-  `;
-  downloadWord('Template_Daftar_Hadir_Rapat_Depo_Farmasi.doc', body);
 }
 
 /* ============ INIT APLIKASI ============ */
