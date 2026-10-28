@@ -15,17 +15,31 @@
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .app{display:flex;min-height:100vh}
 
+/* LOGIN SCREEN */
+.login-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,.1);border:1px solid var(--border);text-align:center}
+.login-icon{width:64px;height:64px;background:var(--primary-light);color:var(--primary);border-radius:16px;display:grid;place-items:center;font-size:32px;margin:0 auto 20px}
+.login-card h2{font-size:22px;margin-bottom:6px}
+.login-card p{color:var(--muted);font-size:13px;margin-bottom:24px}
+.login-form{text-align:left}
+.login-form .field{margin-bottom:16px}
+.login-err{color:var(--danger);font-size:12px;margin-top:-10px;margin-bottom:16px;display:none}
+
 /* SIDEBAR */
-.sidebar{width:260px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;padding:24px 16px;position:fixed;height:100vh;overflow-y:auto;z-index:100;transition:.3s}
+.sidebar{width:260px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;padding:24px 16px;position:fixed;height:100vh;overflow-y:auto;z-index:100;transition:.3s;display:flex;flex-direction:column}
 .brand{display:flex;align-items:center;gap:12px;padding:0 8px 22px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:18px}
 .brand-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:11px;display:grid;place-items:center;font-size:22px}
 .brand h1{font-size:16px;font-weight:700;letter-spacing:.5px}
 .brand p{font-size:11px;opacity:.8}
-.nav{display:flex;flex-direction:column;gap:4px}
+.nav{display:flex;flex-direction:column;gap:4px;flex:1}
 .nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:500;transition:.2s;border:none;background:none;color:#fff;text-align:left;width:100%;font-family:inherit}
 .nav-item:hover{background:rgba(255,255,255,.1)}
 .nav-item.active{background:rgba(255,255,255,.22);font-weight:600}
 .nav-item .icon{font-size:18px;width:22px;text-align:center}
+.user-info{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.user-role{background:rgba(255,255,255,.2);padding:4px 8px;border-radius:6px;font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.5px}
+.btn-logout{background:none;border:none;color:#fca5a5;cursor:pointer;font-size:12px;font-weight:600;text-decoration:underline}
+.btn-logout:hover{color:#fff}
 
 /* MAIN */
 .main{flex:1;margin-left:260px;padding:28px;max-width:calc(100% - 260px)}
@@ -97,11 +111,11 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .collapse-body.open{display:block;animation:fade .25s}
 
 /* TEMPLATE */
-.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .tpl-card{border:1.5px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:.2s;background:#fff}
 .tpl-card:hover{border-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-2px)}
 .tpl-icon{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-size:22px;background:var(--primary-light);color:var(--primary-dark)}
-.tpl-card h4{font-size:14.5px}
+.tpl-card h4{font-size:14.5px;word-break:break-all}
 .tpl-card p{font-size:12px;color:var(--muted);flex:1;line-height:1.5}
 
 /* HISTORY */
@@ -174,7 +188,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 #printArea{display:none}
 @media print{
   body{background:#fff}
-  .app,.modal-overlay,.menu-toggle,.toast{display:none!important}
+  .app,.modal-overlay,.menu-toggle,.toast,.login-overlay{display:none!important}
   #printArea{display:block!important}
   @page{margin:2cm;size:A4}
 }
@@ -200,18 +214,48 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 </head>
 <body>
 
-<div class="app">
+<!-- LOGIN SCREEN -->
+<div class="login-overlay" id="loginScreen">
+  <div class="login-card">
+    <div class="login-icon">💊</div>
+    <h2>SIRAPAT Login</h2>
+    <p>Silakan masuk untuk mengakses sistem</p>
+    <form class="login-form" id="formLogin" onsubmit="return false">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Masukkan username" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Masukkan password" required>
+      </div>
+      <div class="login-err" id="loginErr">Username atau password salah!</div>
+      <button type="button" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">🔑 Masuk</button>
+    </form>
+    <div style="margin-top:20px;font-size:11px;color:var(--muted);text-align:left;background:#f8fafc;padding:12px;border-radius:8px">
+      <b>Akun Demo:</b><br>
+      Superadmin: <code>superadmin</code> / <code>super123</code><br>
+      Admin Depo: <code>admin</code> / <code>admin123</code>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="mainApp" style="display:none">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-icon">💊</div>
       <div><h1>SIRAPAT</h1><p>Undangan Rapat Depo Farmasi</p></div>
     </div>
-    <nav class="nav">
-      <button class="nav-item active" data-page="upload"><span class="icon">📤</span> Upload Hasil Rapat</button>
-      <button class="nav-item" data-page="monitoring"><span class="icon">📊</span> Monitoring Bulanan</button>
-      <button class="nav-item" data-page="template"><span class="icon">📥</span> Download Template</button>
-      <button class="nav-item" data-page="riwayat"><span class="icon">📋</span> Riwayat Undangan</button>
+    <nav class="nav" id="navMenu">
+      <!-- Menu di-generate via JS berdasarkan Role -->
     </nav>
+    <div class="user-info">
+      <div>
+        <div style="font-weight:600;margin-bottom:2px" id="userNameDisplay">User</div>
+        <span class="user-role" id="userRoleDisplay">Role</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
   </aside>
 
   <main class="main">
@@ -269,7 +313,45 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- MONITORING BULANAN -->
+    <!-- TEMPLATE (SUPERADMIN & ADMIN DEPO) -->
+    <section class="page" id="page-template">
+      <div class="topbar">
+        <div><h2>Download Template</h2><p>Unduh format dokumen untuk kegiatan rapat</p></div>
+      </div>
+
+      <!-- UPLOAD TEMPLATE KHUSUS SUPERADMIN -->
+      <div class="card" id="superadminUploadSection" style="display:none; border-left:4px solid var(--primary); background:#f0fdfa">
+        <h3>📤 Upload Template Baru (Khusus Superadmin)</h3>
+        <p class="sub">Unggah file <b>.docx</b> atau <b>.doc</b> agar bisa diunduh oleh Admin Depo.</p>
+        <div class="grid">
+          <div class="field">
+            <label>File Template (.doc / .docx)</label>
+            <input type="file" id="tplFile" accept=".doc, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+          </div>
+          <div class="field">
+            <label>Nama / Judul Template</label>
+            <input type="text" id="tplName" placeholder="Contoh: Template Notulen Rapat">
+          </div>
+          <div class="field full">
+            <label>Deskripsi Singkat</label>
+            <input type="text" id="tplDesc" placeholder="Contoh: Format baku notulen rapat depo farmasi">
+          </div>
+        </div>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn btn-primary" onclick="uploadTemplate()">📤 Upload Template</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📁 Daftar Template Tersedia</h3>
+        <p class="sub">Silakan unduh template di bawah ini untuk digunakan.</p>
+        <div class="tpl-grid" id="templateGrid">
+          <!-- Template akan di-render via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- MONITORING BULANAN (KHUSUS SUPERADMIN) -->
     <section class="page" id="page-monitoring">
       <div class="topbar">
         <div><h2>Monitoring Bulanan</h2><p>Pantau status rapat tiap depo per bulan</p></div>
@@ -306,42 +388,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- TEMPLATE -->
-    <section class="page" id="page-template">
-      <div class="topbar">
-        <div><h2>Download Template</h2><p>Unduh format dokumen untuk setiap depo farmasi</p></div>
-      </div>
-      <div class="card">
-        <div class="tpl-grid">
-          <div class="tpl-card">
-            <div class="tpl-icon">📄</div>
-            <h4>Template Undangan Rapat</h4>
-            <p>Format surat undangan rapat resmi dengan kop surat, siap diedit di Microsoft Word.</p>
-            <button class="btn btn-primary btn-sm" onclick="downloadTemplateUndangan()">⬇ Download (.doc)</button>
-          </div>
-          <div class="tpl-card">
-            <div class="tpl-icon">📝</div>
-            <h4>Template Notulen Rapat</h4>
-            <p>Format catatan hasil rapat: peserta, agenda, pembahasan, dan kesimpulan.</p>
-            <button class="btn btn-primary btn-sm" onclick="downloadTemplateNotulen()">⬇ Download (.doc)</button>
-          </div>
-          <div class="tpl-card">
-            <div class="tpl-icon">🖊️</div>
-            <h4>Template Daftar Hadir</h4>
-            <p>Tabel daftar hadir peserta rapat dengan kolom nama, jabatan, dan tanda tangan.</p>
-            <button class="btn btn-primary btn-sm" onclick="downloadTemplateDaftarHadir()">⬇ Download (.doc)</button>
-          </div>
-          <div class="tpl-card">
-            <div class="tpl-icon">📦</div>
-            <h4>Paket Lengkap (.doc)</h4>
-            <p>Ketiga template di atas dalam satu file dokumen Word untuk kemudahan distribusi.</p>
-            <button class="btn btn-primary btn-sm" onclick="downloadTemplatePaket()">⬇ Download Semua</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BUAT UNDANGAN (Halaman tetap ada, akses via Riwayat) -->
+    <!-- BUAT UNDANGAN (KHUSUS SUPERADMIN) -->
     <section class="page" id="page-buat">
       <div class="topbar">
         <div><h2>Buat Undangan Rapat</h2><p>Isi data rapat, lalu preview dan cetak undangan</p></div>
@@ -427,7 +474,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </section>
 
-    <!-- RIWAYAT -->
+    <!-- RIWAYAT (KHUSUS SUPERADMIN) -->
     <section class="page" id="page-riwayat">
       <div class="topbar">
         <div><h2>Riwayat Undangan</h2><p>Daftar undangan yang telah dibuat</p></div>
@@ -484,10 +531,92 @@ const DEFAULT_SETTINGS = {
   nip:'19800101 200501 1 001'
 };
 
+// State Aplikasi
+let currentUser = null;
 let settings = loadSettings();
 let riwayat = loadRiwayat();
 let currentLetterHTML = '';
 let pendingFiles = [];
+
+/* ============ AUTHENTICATION & RBAC ============ */
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginErr');
+
+  if(u === 'superadmin' && p === 'super123'){
+    currentUser = { name: 'Super Admin', role: 'superadmin' };
+  } else if(u === 'admin' && p === 'admin123'){
+    currentUser = { name: 'Admin Depo', role: 'admin_depo' };
+  } else {
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  localStorage.setItem('sirapat_user', JSON.stringify(currentUser));
+  initApp();
+}
+
+function doLogout(){
+  localStorage.removeItem('sirapat_user');
+  location.reload();
+}
+
+function checkAuth(){
+  const saved = localStorage.getItem('sirapat_user');
+  if(saved){
+    try { currentUser = JSON.parse(saved); } catch(e){}
+  }
+  if(currentUser){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    initApp();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+  }
+}
+
+function renderMenus(){
+  const nav = document.getElementById('navMenu');
+  const isSuper = currentUser.role === 'superadmin';
+  
+  let menus = [
+    { id: 'upload', icon: '📤', text: 'Upload Hasil Rapat' },
+    { id: 'template', icon: '📥', text: 'Download Template' }
+  ];
+
+  if(isSuper){
+    menus.splice(1, 0, { id: 'monitoring', icon: '📊', text: 'Monitoring Bulanan' });
+    menus.push({ id: 'riwayat', icon: '📋', text: 'Riwayat Undangan' });
+  }
+
+  nav.innerHTML = menus.map(m => `
+    <button class="nav-item" data-page="${m.id}" onclick="goPage('${m.id}')">
+      <span class="icon">${m.icon}</span> ${m.text}
+    </button>
+  `).join('');
+  
+  // Update User Info
+  document.getElementById('userNameDisplay').textContent = currentUser.name;
+  document.getElementById('userRoleDisplay').textContent = isSuper ? 'Superadmin' : 'Admin Depo';
+  
+  // Tampilkan form upload template khusus Superadmin
+  document.getElementById('superadminUploadSection').style.display = isSuper ? 'block' : 'none';
+}
+
+function goPage(name){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='page-'+name));
+  document.getElementById('sidebar').classList.remove('open');
+  
+  if(name==='riwayat') renderRiwayat();
+  if(name==='upload') { renderUploadedFiles(); updateUploadStats(); }
+  if(name==='monitoring') renderMonitoring();
+  if(name==='template') renderTemplates();
+  
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 /* ============ UTIL ============ */
 function toast(msg,type='success'){
@@ -536,60 +665,52 @@ function saveRiwayat(){ localStorage.setItem('sirapat_riwayat', JSON.stringify(r
 
 /* ============ INDEXEDDB ============ */
 const DB_NAME = 'sirapat_db';
-const STORE = 'berkas';
+const STORE_BERKAS = 'berkas';
+const STORE_TEMPLATES = 'templates';
 
 function openDB(){
   return new Promise((resolve,reject)=>{
-    const req = indexedDB.open(DB_NAME,1);
+    const req = indexedDB.open(DB_NAME,2); // Upgrade version for templates
     req.onupgradeneeded = e=>{
       const db = e.target.result;
-      if(!db.objectStoreNames.contains(STORE)){
-        db.createObjectStore(STORE,{keyPath:'id'});
+      if(!db.objectStoreNames.contains(STORE_BERKAS)){
+        db.createObjectStore(STORE_BERKAS,{keyPath:'id'});
+      }
+      if(!db.objectStoreNames.contains(STORE_TEMPLATES)){
+        db.createObjectStore(STORE_TEMPLATES,{keyPath:'id'});
       }
     };
     req.onsuccess = e=>resolve(e.target.result);
     req.onerror = e=>reject(e.target.error);
   });
 }
-async function dbAdd(item){
+async function dbAdd(store, item){
   const db = await openDB();
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).put(item);
+    const tx = db.transaction(store,'readwrite');
+    tx.objectStore(store).put(item);
     tx.oncomplete = ()=>resolve(item);
     tx.onerror = e=>reject(e.target.error);
   });
 }
-async function dbGetAll(){
+async function dbGetAll(store){
   const db = await openDB();
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE,'readonly');
-    const req = tx.objectStore(STORE).getAll();
+    const tx = db.transaction(store,'readonly');
+    const req = tx.objectStore(store).getAll();
     req.onsuccess = ()=>resolve(req.result||[]);
     req.onerror = e=>reject(e.target.error);
   });
 }
-async function dbDelete(id){
+async function dbDelete(store, id){
   const db = await openDB();
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).delete(id);
+    const tx = db.transaction(store,'readwrite');
+    tx.objectStore(store).delete(id);
     tx.oncomplete = ()=>resolve();
     tx.onerror = e=>reject(e.target.error);
   });
 }
-
-/* ============ NAVIGASI ============ */
-function goPage(name){
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
-  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='page-'+name));
-  document.getElementById('sidebar').classList.remove('open');
-  if(name==='riwayat') renderRiwayat();
-  if(name==='upload') { renderUploadedFiles(); updateUploadStats(); }
-  if(name==='monitoring') renderMonitoring();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>goPage(b.dataset.page)));
 
 /* ============ PANEL KOP ============ */
 function toggleKop(){
@@ -597,7 +718,114 @@ function toggleKop(){
   document.getElementById('kopHead').classList.toggle('open');
 }
 
-/* ============ UPLOAD BERKAS PDF ============ */
+/* ============ MANAJEMEN TEMPLATE (SUPERADMIN & ADMIN) ============ */
+async function uploadTemplate(){
+  const fileInput = document.getElementById('tplFile');
+  const nameInput = document.getElementById('tplName');
+  const descInput = document.getElementById('tplDesc');
+  
+  if(!fileInput.files.length){ toast('Pilih file terlebih dahulu','error'); return; }
+  const file = fileInput.files[0];
+  
+  if(!nameInput.value.trim()){ toast('Nama template wajib diisi','error'); return; }
+  
+  const isDoc = file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.docx');
+  if(!isDoc){ toast('Hanya file Word (.doc / .docx) yang diizinkan','error'); return; }
+
+  const item = {
+    id: 'tpl_'+Date.now(),
+    name: nameInput.value.trim(),
+    desc: descInput.value.trim(),
+    fileName: file.name,
+    blob: file,
+    uploadedAt: new Date().toISOString()
+  };
+
+  try {
+    await dbAdd(STORE_TEMPLATES, item);
+    toast('Template berhasil diunggah','success');
+    fileInput.value = ''; nameInput.value = ''; descInput.value = '';
+    renderTemplates();
+  } catch(e) {
+    toast('Gagal upload: '+e.message,'error');
+  }
+}
+
+async function renderTemplates(){
+  const grid = document.getElementById('templateGrid');
+  
+  // 1. Template Bawaan Sistem (HTML to Word)
+  const builtInTpls = `
+    <div class="tpl-card">
+      <div class="tpl-icon">📄</div>
+      <h4>Template Undangan Rapat</h4>
+      <p>Format surat undangan rapat resmi dengan kop surat, siap diedit di Microsoft Word.</p>
+      <button class="btn btn-primary btn-sm" onclick="downloadTemplateUndangan()">⬇ Download (.doc)</button>
+    </div>
+    <div class="tpl-card">
+      <div class="tpl-icon">📝</div>
+      <h4>Template Notulen Rapat</h4>
+      <p>Format catatan hasil rapat: peserta, agenda, pembahasan, dan kesimpulan.</p>
+      <button class="btn btn-primary btn-sm" onclick="downloadTemplateNotulen()">⬇ Download (.doc)</button>
+    </div>
+    <div class="tpl-card">
+      <div class="tpl-icon">🖊️</div>
+      <h4>Template Daftar Hadir</h4>
+      <p>Tabel daftar hadir peserta rapat dengan kolom nama, jabatan, dan tanda tangan.</p>
+      <button class="btn btn-primary btn-sm" onclick="downloadTemplateDaftarHadir()">⬇ Download (.doc)</button>
+    </div>
+  `;
+
+  // 2. Template Uploadan Superadmin (Dari IndexedDB)
+  let uploadedHtml = '';
+  try {
+    const files = await dbGetAll(STORE_TEMPLATES);
+    files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    
+    if(files.length > 0){
+      uploadedHtml = files.map(f => `
+        <div class="tpl-card" style="border-color:var(--primary)">
+          <div class="tpl-icon" style="background:#f0fdfa">📎</div>
+          <h4>${escapeHtml(f.name)}</h4>
+          <p>${escapeHtml(f.desc || 'File template unggahan Superadmin')}</p>
+          <div style="display:flex;gap:6px;margin-top:auto">
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="downloadUploadedTemplate('${f.id}')">⬇ Unduh (${f.fileName.split('.').pop()})</button>
+            ${currentUser.role === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="hapusTemplate('${f.id}')">🗑️</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch(e) { console.error(e); }
+
+  grid.innerHTML = builtInTpls + uploadedHtml;
+}
+
+async function downloadUploadedTemplate(id){
+  try{
+    const files = await dbGetAll(STORE_TEMPLATES);
+    const f = files.find(x=>x.id===id);
+    if(!f || !f.blob){ toast('File tidak ditemukan','error'); return; }
+    const url = URL.createObjectURL(f.blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = f.fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    toast('Mengunduh: '+f.name,'success');
+  }catch(e){ toast('Gagal mengunduh: '+e.message,'error'); }
+}
+
+async function hapusTemplate(id){
+  if(!confirm('Hapus template ini? Admin depo tidak akan bisa mengunduhnya lagi.')) return;
+  try{
+    await dbDelete(STORE_TEMPLATES, id);
+    toast('Template dihapus','success');
+    renderTemplates();
+  }catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
+}
+
+
+/* ============ UPLOAD BERKAS PDF HASIL RAPAT ============ */
 function setupUploadZone(){
   const zone = document.getElementById('uploadZone');
   const input = document.getElementById('fileInput');
@@ -658,7 +886,7 @@ async function doUpload(){
       uploadedAt: new Date().toISOString()
     };
     try{
-      await dbAdd(item);
+      await dbAdd(STORE_BERKAS, item);
       ok++;
     }catch(e){
       fail++;
@@ -675,7 +903,7 @@ async function doUpload(){
 async function renderUploadedFiles(){
   const list = document.getElementById('fileList');
   try{
-    const files = await dbGetAll();
+    const files = await dbGetAll(STORE_BERKAS);
     files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
 
     if(!files.length){
@@ -709,7 +937,7 @@ async function renderUploadedFiles(){
 
 async function updateUploadStats(){
   try{
-    const files = await dbGetAll();
+    const files = await dbGetAll(STORE_BERKAS);
     document.getElementById('upStatTotal').textContent = files.length;
     const now = new Date();
     const bln = files.filter(f=>{
@@ -722,7 +950,7 @@ async function updateUploadStats(){
 
 async function previewFile(id){
   try{
-    const files = await dbGetAll();
+    const files = await dbGetAll(STORE_BERKAS);
     const f = files.find(x=>x.id===id);
     if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
     const url = URL.createObjectURL(f.blob);
@@ -733,7 +961,7 @@ async function previewFile(id){
 
 async function downloadFile(id){
   try{
-    const files = await dbGetAll();
+    const files = await dbGetAll(STORE_BERKAS);
     const f = files.find(x=>x.id===id);
     if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
     const url = URL.createObjectURL(f.blob);
@@ -749,7 +977,7 @@ async function downloadFile(id){
 async function deleteFile(id){
   if(!confirm('Hapus berkas ini?')) return;
   try{
-    await dbDelete(id);
+    await dbDelete(STORE_BERKAS, id);
     toast('Berkas dihapus','success');
     await renderUploadedFiles();
     updateUploadStats();
@@ -796,7 +1024,7 @@ function parseTanggalBulan(tglStr){
   const y = parseInt(parts[0]);
   const m = parseInt(parts[1]);
   if(!y || !m) return null;
-  return { y, m: m - 1 }; // m dalam 0-11
+  return { y, m: m - 1 };
 }
 
 async function renderMonitoring(){
@@ -806,22 +1034,19 @@ async function renderMonitoring(){
   const subtitle = document.getElementById('monSubtitle');
   subtitle.textContent = `Menampilkan status rapat bulan ${BULAN[bln]} ${thn}.`;
 
-  // Filter undangan bulan ini
   const undanganBulan = riwayat.filter(r=>{
     const p = parseTanggalBulan(r.tanggal);
     return p && p.y === thn && p.m === bln;
   });
 
-  // Filter hasil (PDF) bulan ini
   let files = [];
-  try { files = await dbGetAll(); } catch(e){}
+  try { files = await dbGetAll(STORE_BERKAS); } catch(e){}
   const hasilBulan = files.filter(f=>{
     const tgl = f.tanggal || (f.uploadedAt ? f.uploadedAt.slice(0,10) : null);
     const p = parseTanggalBulan(tgl);
     return p && p.y === thn && p.m === bln;
   });
 
-  // Hitung status tiap depo
   const data = DEPO_LIST.map(depo=>{
     const key = depo.trim().toLowerCase();
     const u = undanganBulan.filter(x => (x.depo||'').trim().toLowerCase() === key);
@@ -832,7 +1057,6 @@ async function renderMonitoring(){
     return { depo, undangan: u, hasil: h, status };
   });
 
-  // Update stats
   const sudah = data.filter(d=>d.status==='sudah').length;
   const terjadwal = data.filter(d=>d.status==='terjadwal').length;
   const belum = data.filter(d=>d.status==='belum').length;
@@ -841,7 +1065,6 @@ async function renderMonitoring(){
   document.getElementById('monStatBelum').textContent = belum;
   document.getElementById('monStatPersen').textContent = Math.round(sudah/DEPO_LIST.length*100) + '%';
 
-  // Render list (TANPA TOMBOL AKSI)
   const list = document.getElementById('monList');
   if(!data.length){
     list.innerHTML = `<div class="empty"><p>Tidak ada depo terdaftar.</p></div>`;
@@ -855,7 +1078,6 @@ async function renderMonitoring(){
     const badgeText = isSudah ? '✅ Sudah Rapat' : (isTerjadwal ? '⏳ Terjadwal' : '⚠️ Belum Rapat');
     const icon = isSudah ? '✅' : (isTerjadwal ? '⏳' : '⚠️');
 
-    // Detail
     let detail = '';
     if(isSudah){
       const lines = [];
@@ -1092,7 +1314,7 @@ function simpanSettings(){
   toast('Kop surat disimpan','success');
 }
 
-/* ============ DOWNLOAD WORD ============ */
+/* ============ DOWNLOAD WORD (DEFAULT TEMPLATES) ============ */
 function downloadWord(filename, bodyHTML){
   const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
   <head><meta charset='utf-8'><title>Document</title>
@@ -1232,77 +1454,24 @@ function downloadTemplateDaftarHadir(){
   downloadWord('Template_Daftar_Hadir_Rapat_Depo_Farmasi.doc', body);
 }
 
-function downloadTemplatePaket(){
-  const s = settings;
-  const body = `
-    <div style="page-break-after:always">${buildTemplateUndanganStr(s)}</div>
-    <div style="page-break-after:always">${buildTemplateNotulenStr(s)}</div>
-    <div>${buildTemplateDaftarHadirStr(s)}</div>
-  `;
-  downloadWord('Paket_Template_Rapat_Depo_Farmasi.doc', body);
-}
-
-function buildTemplateUndanganStr(s){
-  return `${kopHTML(s)}
-    <div class="title"><h3>UNDANGAN RAPAT</h3><p>Nomor: ..../IF/UND/..../....</p></div>
-    <p style="margin-top:20px">Kepada Yth,</p>
-    <p><b>Seluruh Staf Depo Farmasi ..............................</b></p>
-    <p>di Tempat</p>
-    <p style="margin-top:14px">Dengan hormat,</p>
-    <p style="text-align:justify">Sehubungan dengan akan dilaksanakannya rapat koordinasi internal, dengan ini kami mengundang Bapak/Ibu/Saudara untuk hadir pada:</p>
-    <table class="meta" style="margin-left:20px">
-      <tr><td>Hari / Tanggal</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Waktu</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Tempat</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Agenda</td><td>:</td><td>...........................</td></tr>
-    </table>
-    <p style="text-align:justify;margin-top:14px">Demikian undangan ini kami sampaikan. Atas perhatian dan kehadirannya kami ucapkan terima kasih.</p>
-    <div class="ttd"><div class="inner">
-      <p>${escapeHtml(s.kota)}, ...........................</p><p>${escapeHtml(s.jabatan)}</p>
-      <div class="space"></div><p class="name">${escapeHtml(s.penandatangan)}</p><p>NIP. ${escapeHtml(s.nip)}</p>
-    </div></div>`;
-}
-function buildTemplateNotulenStr(s){
-  return `${kopHTML(s)}
-    <div class="title"><h3>NOTULEN RAPAT</h3></div>
-    <table class="meta" style="margin-top:16px">
-      <tr><td>Hari / Tanggal</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Waktu</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Tempat</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Depo</td><td>:</td><td>...........................</td></tr>
-    </table>
-    <p style="margin-top:16px"><b>A. PESERTA</b></p>
-    <table class="data"><tr><th style="width:40px">No</th><th>Nama</th><th>Jabatan</th><th>TTD</th></tr>
-    ${Array.from({length:6}).map((_,i)=>`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td></tr>`).join('')}</table>
-    <p style="margin-top:16px"><b>B. AGENDA</b></p><div class="box"></div>
-    <p style="margin-top:16px"><b>C. PEMBAHASAN</b></p><div class="box" style="min-height:130px"></div>
-    <p style="margin-top:16px"><b>D. KESIMPULAN</b></p><div class="box" style="min-height:90px"></div>`;
-}
-function buildTemplateDaftarHadirStr(s){
-  return `${kopHTML(s)}
-    <div class="title"><h3>DAFTAR HADIR RAPAT</h3><p>Depo Farmasi: ...........................</p></div>
-    <table class="meta" style="margin-top:16px">
-      <tr><td>Hari / Tanggal</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Waktu</td><td>:</td><td>...........................</td></tr>
-      <tr><td>Tempat</td><td>:</td><td>...........................</td></tr>
-    </table>
-    <table class="data" style="margin-top:16px">
-      <tr><th style="width:40px">No</th><th>Nama</th><th>Jabatan</th><th>TTD</th></tr>
-      ${Array.from({length:15}).map((_,i)=>`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td></tr>`).join('')}
-    </table>`;
-}
-
-/* ============ INIT ============ */
-(function init(){
+/* ============ INIT APLIKASI ============ */
+function initApp(){
+  renderMenus();
+  
+  // Set menu pertama sebagai default (Upload)
+  goPage('upload');
+  
   setDefaultFormValues();
   loadSettingsToForm();
   renderRiwayat();
   setupUploadZone();
-  renderUploadedFiles();
   updateUploadStats();
   initMonFilter();
-  renderMonitoring();
-})();
+  renderTemplates();
+}
+
+// Cek login saat halaman dimuat
+window.addEventListener('DOMContentLoaded', checkAuth);
 </script>
 </body>
 </html>
