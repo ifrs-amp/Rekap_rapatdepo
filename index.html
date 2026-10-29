@@ -102,14 +102,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .file-main .ket{font-style:italic;margin-top:2px;color:#475569}
 .file-actions{display:flex;gap:6px;flex-wrap:wrap}
 
-/* COLLAPSIBLE */
-.collapse-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;gap:10px}
-.collapse-head h3{margin:0}
-.chev{transition:.25s;color:var(--muted);font-size:14px}
-.collapse-head.open .chev{transform:rotate(180deg)}
-.collapse-body{display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
-.collapse-body.open{display:block;animation:fade .25s}
-
 /* TEMPLATE */
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .tpl-card{border:1.5px solid var(--border);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:.2s;background:#fff}
@@ -265,7 +257,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
       <div class="card" id="superadminUploadSection" style="display:none; border-left:4px solid var(--primary); background:#f0fdfa">
         <h3>📤 Upload Template Baru (Khusus Superadmin)</h3>
-        <p class="sub">Unggah file <b>.docx</b> atau <b>.doc</b> agar bisa diunduh oleh Admin Depo.</p>
+        <p class="sub">Unggah file <b>.docx</b> atau <b>.doc</b> ke Google Drive agar bisa diunduh oleh Admin Depo.</p>
         <div class="grid">
           <div class="field">
             <label>File Template (.doc / .docx)</label>
@@ -281,7 +273,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           </div>
         </div>
         <div class="actions" style="margin-top:14px">
-          <button class="btn btn-primary" onclick="uploadTemplate()">📤 Upload Template</button>
+          <button class="btn btn-primary" onclick="uploadTemplate()" id="btnUploadTpl">📤 Upload Template</button>
         </div>
       </div>
       <div class="card">
@@ -337,7 +329,8 @@ const DEPO_LIST = [
 ];
 
 let currentUser = null;
-let riwayat = loadRiwayat();
+let riwayat = [];
+let templates = [];
 let pendingFiles = [];
 
 /* ============ AUTHENTICATION & RBAC ============ */
@@ -376,21 +369,18 @@ function doLogout(){
   localStorage.removeItem('sirapat_user');
   location.reload();
 }
-
 function transitionToApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainApp').style.display = 'flex';
   initApp();
 }
-
 function checkAuth(){
   const saved = localStorage.getItem('sirapat_user');
   if(saved){
     try { currentUser = JSON.parse(saved); } catch(e){}
   }
-  if(currentUser){
-    transitionToApp();
-  } else {
+  if(currentUser){ transitionToApp(); } 
+  else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('mainApp').style.display = 'none';
     showRoleSelection();
@@ -454,17 +444,9 @@ function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ============ LOCALSTORAGE ============ */
-function loadRiwayat(){
-  try{ return JSON.parse(localStorage.getItem('sirapat_riwayat')||'[]'); }
-  catch(e){ return []; }
-}
-function saveRiwayat(){ localStorage.setItem('sirapat_riwayat', JSON.stringify(riwayat)); }
-
-/* ============ INDEXEDDB ============ */
+/* ============ INDEXEDDB (KHUSUS FILE HASIL RAPAT PDF) ============ */
 const DB_NAME = 'sirapat_db';
 const STORE_BERKAS = 'berkas';
-const STORE_TEMPLATES = 'templates';
 
 function openDB(){
   return new Promise((resolve,reject)=>{
@@ -472,45 +454,45 @@ function openDB(){
     req.onupgradeneeded = e=>{
       const db = e.target.result;
       if(!db.objectStoreNames.contains(STORE_BERKAS)) db.createObjectStore(STORE_BERKAS,{keyPath:'id'});
-      if(!db.objectStoreNames.contains(STORE_TEMPLATES)) db.createObjectStore(STORE_TEMPLATES,{keyPath:'id'});
     };
     req.onsuccess = e=>resolve(e.target.result);
     req.onerror = e=>reject(e.target.error);
   });
 }
-async function dbAdd(store, item){
+async function dbAdd(item){
   const db = await openDB();
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).put(item);
+    const tx = db.transaction(STORE_BERKAS,'readwrite');
+    tx.objectStore(STORE_BERKAS).put(item);
     tx.oncomplete = ()=>resolve(item);
     tx.onerror = e=>reject(e.target.error);
   });
 }
-async function dbGetAll(store){
+async function dbGetAll(){
   const db = await openDB();
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,'readonly');
-    const req = tx.objectStore(store).getAll();
+    const tx = db.transaction(STORE_BERKAS,'readonly');
+    const req = tx.objectStore(STORE_BERKAS).getAll();
     req.onsuccess = ()=>resolve(req.result||[]);
     req.onerror = e=>reject(e.target.error);
   });
 }
-async function dbDelete(store, id){
+async function dbDelete(id){
   const db = await openDB();
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).delete(id);
+    const tx = db.transaction(STORE_BERKAS,'readwrite');
+    tx.objectStore(STORE_BERKAS).delete(id);
     tx.oncomplete = ()=>resolve();
     tx.onerror = e=>reject(e.target.error);
   });
 }
 
-/* ============ MANAJEMEN TEMPLATE ============ */
+/* ============ MANAJEMEN TEMPLATE (VIA GOOGLE DRIVE & SHEETS) ============ */
 async function uploadTemplate(){
   const fileInput = document.getElementById('tplFile');
   const nameInput = document.getElementById('tplName');
   const descInput = document.getElementById('tplDesc');
+  const btn = document.getElementById('btnUploadTpl');
   
   if(!fileInput.files.length){ toast('Pilih file terlebih dahulu','error'); return; }
   const file = fileInput.files[0];
@@ -518,73 +500,87 @@ async function uploadTemplate(){
   const isDoc = file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.docx');
   if(!isDoc){ toast('Hanya file Word (.doc / .docx) yang diizinkan','error'); return; }
 
-  const item = {
-    id: 'tpl_'+Date.now(),
-    name: nameInput.value.trim(),
-    desc: descInput.value.trim(),
-    fileName: file.name,
-    blob: file,
-    uploadedAt: new Date().toISOString()
-  };
+  btn.textContent = "⏳ Mengunggah...";
+  btn.disabled = true;
 
-  try {
-    await dbAdd(STORE_TEMPLATES, item);
-    toast('Template berhasil diunggah','success');
-    fileInput.value = ''; nameInput.value = ''; descInput.value = '';
-    renderTemplates();
-  } catch(e) {
-    toast('Gagal upload: '+e.message,'error');
+  const reader = new FileReader();
+  reader.onload = async function() {
+    // Ambil base64 dari DataURL
+    const base64Data = reader.result.split(',')[1];
+    
+    const payload = {
+      action: 'uploadTemplate',
+      name: nameInput.value.trim(),
+      desc: descInput.value.trim(),
+      fileName: file.name,
+      mimeType: file.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      base64: base64Data
+    };
+
+    try {
+      const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+      
+      const resData = await response.json();
+      if(resData.status === 'success') {
+        toast('Template berhasil diunggah ke Cloud', 'success');
+        fileInput.value = ''; nameInput.value = ''; descInput.value = '';
+        await loadFromGoogleSheet(); // Refresh data dari cloud
+      } else {
+        toast('Gagal: ' + resData.message, 'error');
+      }
+    } catch(e) {
+      toast('Gagal koneksi: ' + e.message, 'error');
+    } finally {
+      btn.textContent = "📤 Upload Template";
+      btn.disabled = false;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderTemplates(){
+  const grid = document.getElementById('templateGrid');
+  if(templates.length > 0){
+    grid.innerHTML = templates.map(f => `
+      <div class="tpl-card" style="border-color:var(--primary)">
+        <div class="tpl-icon" style="background:#f0fdfa">📎</div>
+        <h4>${escapeHtml(f.name)}</h4>
+        <p>${escapeHtml(f.desc || 'File template unggahan Superadmin')}</p>
+        <div style="display:flex;gap:6px;margin-top:auto">
+          <a href="${f.url}" target="_blank" class="btn btn-primary btn-sm" style="flex:1; text-decoration:none; justify-content:center;">⬇ Unduh (${f.fileName.split('.').pop()})</a>
+          ${currentUser.role === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="hapusTemplate('${f.id}')">🗑️</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } else {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column: 1 / -1; width: 100%;">
+        <span class="icon">📭</span>
+        <p>Belum ada template yang diunggah.</p>
+        ${currentUser.role === 'superadmin' ? '<p style="margin-top:8px;font-size:12px">Silakan unggah file template melalui form di atas.</p>' : '<p style="margin-top:8px;font-size:12px">Silakan hubungi Superadmin untuk mengunggah template.</p>'}
+      </div>
+    `;
   }
 }
 
-async function renderTemplates(){
-  const grid = document.getElementById('templateGrid');
-  let uploadedHtml = '';
-  try {
-    const files = await dbGetAll(STORE_TEMPLATES);
-    files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
-    if(files.length > 0){
-      uploadedHtml = files.map(f => `
-        <div class="tpl-card" style="border-color:var(--primary)">
-          <div class="tpl-icon" style="background:#f0fdfa">📎</div>
-          <h4>${escapeHtml(f.name)}</h4>
-          <p>${escapeHtml(f.desc || 'File template unggahan Superadmin')}</p>
-          <div style="display:flex;gap:6px;margin-top:auto">
-            <button class="btn btn-primary btn-sm" style="flex:1" onclick="downloadUploadedTemplate('${f.id}')">⬇ Unduh (${f.fileName.split('.').pop()})</button>
-            ${currentUser.role === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="hapusTemplate('${f.id}')">🗑️</button>` : ''}
-          </div>
-        </div>
-      `).join('');
-    } else {
-      uploadedHtml = `
-        <div class="empty" style="grid-column: 1 / -1; width: 100%;">
-          <span class="icon">📭</span>
-          <p>Belum ada template yang diunggah.</p>
-          ${currentUser.role === 'superadmin' ? '<p style="margin-top:8px;font-size:12px">Silakan unggah file template melalui form di atas.</p>' : '<p style="margin-top:8px;font-size:12px">Silakan hubungi Superadmin untuk mengunggah template.</p>'}
-        </div>
-      `;
-    }
-  } catch(e) { uploadedHtml = `<div class="empty"><p>Gagal memuat template.</p></div>`; }
-  grid.innerHTML = uploadedHtml;
-}
-
-async function downloadUploadedTemplate(id){
-  try{
-    const files = await dbGetAll(STORE_TEMPLATES);
-    const f = files.find(x=>x.id===id);
-    if(!f || !f.blob){ toast('File tidak ditemukan','error'); return; }
-    const url = URL.createObjectURL(f.blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = f.fileName;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url), 1500);
-    toast('Mengunduh: '+f.name,'success');
-  }catch(e){ toast('Gagal mengunduh: '+e.message,'error'); }
-}
 async function hapusTemplate(id){
-  if(!confirm('Hapus template ini?')) return;
-  try{ await dbDelete(STORE_TEMPLATES, id); toast('Template dihapus','success'); renderTemplates(); }
-  catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
+  if(!confirm('Hapus template ini dari Cloud?')) return;
+  try{
+    const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'deleteTemplate', id: id })
+    });
+    const resData = await response.json();
+    if(resData.status === 'success') {
+      toast('Template dihapus','success'); 
+      await loadFromGoogleSheet();
+    }
+  }catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
 }
 
 /* ============ UPLOAD BERKAS PDF HASIL RAPAT ============ */
@@ -631,10 +627,10 @@ async function doUpload(){
       name: file.name, size: file.size, type: 'application/pdf', blob: file,
       depo, tanggal, keterangan, uploadedAt: new Date().toISOString()
     };
-    try{ await dbAdd(STORE_BERKAS, item); ok++; }
+    try{ await dbAdd(item); ok++; }
     catch(e){ fail++; toast('Gagal upload: '+file.name+' — '+e.message,'error'); }
   }
-  if(ok) toast(ok+' berkas berhasil diunggah','success');
+  if(ok) toast(ok+' berkas berhasil disimpan di perangkat ini','success');
   if(fail) toast(fail+' berkas gagal diunggah','error');
   resetUploadForm();
   await renderUploadedFiles();
@@ -644,7 +640,7 @@ async function doUpload(){
 async function renderUploadedFiles(){
   const list = document.getElementById('fileList');
   try{
-    const files = await dbGetAll(STORE_BERKAS);
+    const files = await dbGetAll();
     files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
     if(!files.length){
       list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada berkas terunggah.</p><p style="margin-top:8px;font-size:12px">Unggah berkas hasil rapat pada form di atas.</p></div>`;
@@ -676,7 +672,7 @@ async function renderUploadedFiles(){
 
 async function updateUploadStats(){
   try{
-    const files = await dbGetAll(STORE_BERKAS);
+    const files = await dbGetAll();
     document.getElementById('upStatTotal').textContent = files.length;
     const now = new Date();
     const bln = files.filter(f=>{
@@ -689,7 +685,7 @@ async function updateUploadStats(){
 
 async function previewFile(id){
   try{
-    const files = await dbGetAll(STORE_BERKAS);
+    const files = await dbGetAll();
     const f = files.find(x=>x.id===id);
     if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
     const url = URL.createObjectURL(f.blob);
@@ -699,7 +695,7 @@ async function previewFile(id){
 }
 async function downloadFile(id){
   try{
-    const files = await dbGetAll(STORE_BERKAS);
+    const files = await dbGetAll();
     const f = files.find(x=>x.id===id);
     if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
     const url = URL.createObjectURL(f.blob);
@@ -713,7 +709,7 @@ async function downloadFile(id){
 async function deleteFile(id){
   if(!confirm('Hapus berkas ini?')) return;
   try{
-    await dbDelete(STORE_BERKAS, id);
+    await dbDelete(id);
     toast('Berkas dihapus','success');
     await renderUploadedFiles();
     updateUploadStats();
@@ -724,7 +720,7 @@ async function deleteFile(id){
 /* ============ SINKRONISASI KE GOOGLE SHEETS ============ */
 async function loadFromGoogleSheet(showToast = false) {
   try {
-    if(showToast) toast("Menarik data terbaru dari Google Sheets...", "success");
+    if(showToast) toast("Menarik data terbaru dari Cloud...", "success");
     
     const response = await fetch(URL_GOOGLE_APPS_SCRIPT + "?t=" + new Date().getTime(), {
       method: 'GET',
@@ -733,35 +729,31 @@ async function loadFromGoogleSheet(showToast = false) {
     
     if (!response.ok) throw new Error("HTTP error " + response.status);
     
-    const data = await response.json();
+    const resData = await response.json();
     
-    if (Array.isArray(data)) {
-      if(data.length > 0) {
-        riwayat = data.map((row, idx) => ({
-          id: 'sheet_' + idx,
-          nomor: row.nomor || '',
-          tanggal: row.tanggal || '',
-          depo: row.depo || '',
-          tempat: row.tempat || '',
-          waktu: row.waktu || '',
-          zona: row.zona || '',
-          agenda: row.agenda || '',
+    if (resData.status === 'success') {
+      // 1. Update Riwayat Undangan
+      if (Array.isArray(resData.riwayat)) {
+        riwayat = resData.riwayat.map((row, idx) => ({
+          id: 'sheet_' + idx, nomor: row.nomor || '', tanggal: row.tanggal || '', depo: row.depo || '',
+          tempat: row.tempat || '', waktu: row.waktu || '', zona: row.zona || '', agenda: row.agenda || '',
           createdAt: row.createdAt || new Date().toISOString()
         })).reverse(); 
-        
-        saveRiwayat();
-        if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
-        if(showToast) toast("Data berhasil disinkronkan ("+data.length+" baris)", "success");
-      } else {
-        riwayat = [];
-        saveRiwayat();
-        if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
-        if(showToast) toast("Belum ada data di Google Sheets", "success");
       }
+
+      // 2. Update Templates
+      if (Array.isArray(resData.templates)) {
+        templates = resData.templates.reverse();
+      }
+
+      if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
+      if(document.getElementById('page-template').classList.contains('active')) renderTemplates();
+      
+      if(showToast) toast("Sinkronisasi berhasil", "success");
     }
   } catch (error) {
-    console.error("Gagal memuat data dari Google Sheets:", error);
-    if(showToast) toast("Gagal sinkronisasi. Pastikan URL Web App benar & di-deploy ulang.", "error");
+    console.error("Gagal memuat data:", error);
+    if(showToast) toast("Gagal sinkronisasi. Periksa koneksi internet.", "error");
   }
 }
 
@@ -810,7 +802,7 @@ async function renderMonitoring(){
     return p && p.y === thn && p.m === bln;
   });
   let files = [];
-  try { files = await dbGetAll(STORE_BERKAS); } catch(e){}
+  try { files = await dbGetAll(); } catch(e){}
   const hasilBulan = files.filter(f=>{
     const tgl = f.tanggal || (f.uploadedAt ? f.uploadedAt.slice(0,10) : null);
     const p = parseTanggalBulan(tgl);
@@ -899,9 +891,9 @@ function initApp(){
   setupUploadZone();
   updateUploadStats();
   initMonFilter();
-  renderTemplates();
+  renderTemplates(); // Render kosong dulu
 
-  loadFromGoogleSheet();
+  loadFromGoogleSheet(); // Tarik data dari Cloud (Riwayat & Template)
 }
 
 window.addEventListener('DOMContentLoaded', checkAuth);
