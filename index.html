@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
       <div class="card">
         <h3>📤 Unggah Berkas PDF</h3>
-        <p class="sub">Hanya menerima file <b>PDF</b>, maksimal 25MB per file.</p>
+        <p class="sub">Hanya menerima file <b>PDF</b>, maksimal 10MB per file.</p>
         <div class="upload-zone" id="uploadZone">
           <span class="icon">📄</span>
           <p><b>Klik atau seret file PDF ke sini</b></p>
@@ -240,13 +240,13 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           </div>
         </div>
         <div class="actions">
-          <button class="btn btn-primary" onclick="doUpload()">📤 Upload Berkas</button>
+          <button class="btn btn-primary" id="btnUploadBerkas" onclick="doUpload()">📤 Upload Berkas</button>
           <button class="btn btn-ghost" onclick="resetUploadForm()">↺ Reset</button>
         </div>
       </div>
       <div class="card">
         <h3>📁 Berkas Terunggah</h3>
-        <p class="sub">Daftar berkas hasil rapat yang sudah diunggah.</p>
+        <p class="sub">Daftar berkas hasil rapat yang tersimpan di Cloud (sama di semua perangkat). <a href="#" onclick="loadFromGoogleSheet(true);return false">🔄 Segarkan</a></p>
         <div id="fileList"><div class="empty"><p>Memuat…</p></div></div>
       </div>
     </section>
@@ -444,48 +444,12 @@ function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ============ INDEXEDDB (KHUSUS FILE HASIL RAPAT PDF) ============ */
-const DB_NAME = 'sirapat_db';
-const STORE_BERKAS = 'berkas';
-
-function openDB(){
-  return new Promise((resolve,reject)=>{
-    const req = indexedDB.open(DB_NAME,2);
-    req.onupgradeneeded = e=>{
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains(STORE_BERKAS)) db.createObjectStore(STORE_BERKAS,{keyPath:'id'});
-    };
-    req.onsuccess = e=>resolve(e.target.result);
-    req.onerror = e=>reject(e.target.error);
-  });
-}
-async function dbAdd(item){
-  const db = await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE_BERKAS,'readwrite');
-    tx.objectStore(STORE_BERKAS).put(item);
-    tx.oncomplete = ()=>resolve(item);
-    tx.onerror = e=>reject(e.target.error);
-  });
-}
-async function dbGetAll(){
-  const db = await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE_BERKAS,'readonly');
-    const req = tx.objectStore(STORE_BERKAS).getAll();
-    req.onsuccess = ()=>resolve(req.result||[]);
-    req.onerror = e=>reject(e.target.error);
-  });
-}
-async function dbDelete(id){
-  const db = await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE_BERKAS,'readwrite');
-    tx.objectStore(STORE_BERKAS).delete(id);
-    tx.oncomplete = ()=>resolve();
-    tx.onerror = e=>reject(e.target.error);
-  });
-}
+/* ============ DATA BERKAS (DISIMPAN DI GOOGLE DRIVE + SHEET, BUKAN DI BROWSER) ============ */
+let berkas = [];
+let berkasLoaded = false;
+const MAX_FILE_MB = 10;
+function driveViewUrl(id){ return 'https://drive.google.com/file/d/'+id+'/view'; }
+function driveDownloadUrl(id){ return 'https://drive.google.com/uc?export=download&id='+id; }
 
 /* ============ MANAJEMEN TEMPLATE (VIA GOOGLE DRIVE & SHEETS) ============ */
 async function uploadTemplate(){
@@ -595,11 +559,11 @@ function setupUploadZone(){
 }
 function handleSelectedFiles(files){
   const valid = [];
-  const MAX = 25*1024*1024;
+  const MAX = MAX_FILE_MB*1024*1024;
   for(const f of files){
     const isPdf = f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
     if(!isPdf){ toast('Bukan PDF: '+f.name,'error'); continue; }
-    if(f.size > MAX){ toast('Melebihi 25MB: '+f.name,'error'); continue; }
+    if(f.size > MAX){ toast('Melebihi '+MAX_FILE_MB+'MB: '+f.name,'error'); continue; }
     valid.push(f);
   }
   pendingFiles = valid;
@@ -615,105 +579,104 @@ function resetUploadForm(){
   document.getElementById('upKeterangan').value = '';
   document.getElementById('uploadHint').textContent = 'Belum ada file dipilih';
 }
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(String(r.result).split(',')[1]);
+    r.onerror = ()=>reject(new Error('Gagal membaca file'));
+    r.readAsDataURL(file);
+  });
+}
 async function doUpload(){
   if(!pendingFiles.length){ toast('Pilih file PDF terlebih dahulu','error'); return; }
+  const btn = document.getElementById('btnUploadBerkas');
   const depo = document.getElementById('upDepo').value.trim();
   const tanggal = document.getElementById('upTanggal').value;
   const keterangan = document.getElementById('upKeterangan').value.trim();
-  let ok = 0, fail = 0;
+  let ok = 0, fail = 0, n = 0;
+  btn.disabled = true;
   for(const file of pendingFiles){
-    const item = {
-      id: 'pdf_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-      name: file.name, size: file.size, type: 'application/pdf', blob: file,
-      depo, tanggal, keterangan, uploadedAt: new Date().toISOString()
-    };
-    try{ await dbAdd(item); ok++; }
-    catch(e){ fail++; toast('Gagal upload: '+file.name+' — '+e.message,'error'); }
+    n++;
+    btn.textContent = '⏳ Mengunggah ' + n + '/' + pendingFiles.length + '...';
+    try{
+      const base64 = await fileToBase64(file);
+      const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'uploadBerkas',
+          fileName: file.name, size: file.size, mimeType: 'application/pdf', base64,
+          depo, tanggal, keterangan
+        })
+      });
+      const res = await response.json();
+      if(res.status === 'success') ok++;
+      else { fail++; toast('Gagal upload: '+file.name+' — '+res.message,'error'); }
+    }catch(e){ fail++; toast('Gagal upload: '+file.name+' — '+e.message,'error'); }
   }
-  if(ok) toast(ok+' berkas berhasil disimpan di perangkat ini','success');
+  btn.disabled = false;
+  btn.textContent = '📤 Upload Berkas';
+  if(ok) toast(ok+' berkas berhasil disimpan ke Cloud','success');
   if(fail) toast(fail+' berkas gagal diunggah','error');
   resetUploadForm();
-  await renderUploadedFiles();
-  updateUploadStats();
+  await loadFromGoogleSheet();
 }
 
-async function renderUploadedFiles(){
+function renderUploadedFiles(){
   const list = document.getElementById('fileList');
-  try{
-    const files = await dbGetAll();
-    files.sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
-    if(!files.length){
-      list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada berkas terunggah.</p><p style="margin-top:8px;font-size:12px">Unggah berkas hasil rapat pada form di atas.</p></div>`;
-      return;
-    }
-    list.innerHTML = files.map(f=>`
-      <div class="file-item">
-        <div class="file-icon">📄</div>
-        <div class="file-main">
-          <h4>${escapeHtml(f.name)}</h4>
-          <p>
-            ${f.depo ? '🏥 '+escapeHtml(f.depo)+' &nbsp;·&nbsp; ' : ''}
-            ${f.tanggal ? '📅 '+formatTanggal(f.tanggal)+' &nbsp;·&nbsp; ' : ''}
-            ⬆ ${formatTanggalWaktu(f.uploadedAt)}
-          </p>
-          ${f.keterangan ? `<p class="ket">📝 ${escapeHtml(f.keterangan)}</p>` : ''}
-        </div>
-        <div class="file-actions">
-          <button class="btn btn-outline btn-sm" onclick="previewFile('${f.id}')">👁️ Buka</button>
-          <button class="btn btn-primary btn-sm" onclick="downloadFile('${f.id}')">⬇ Unduh</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}')">🗑️</button>
-        </div>
-      </div>
-    `).join('');
-  }catch(e){
-    list.innerHTML = `<div class="empty"><p>Gagal memuat berkas: ${escapeHtml(e.message)}</p></div>`;
+  if(!berkasLoaded){ list.innerHTML = `<div class="empty"><p>Memuat dari Cloud…</p></div>`; return; }
+  const files = berkas.slice().sort((a,b)=> new Date(b.uploadedAt) - new Date(a.uploadedAt));
+  if(!files.length){
+    list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada berkas terunggah.</p><p style="margin-top:8px;font-size:12px">Unggah berkas hasil rapat pada form di atas.</p></div>`;
+    return;
   }
+  list.innerHTML = files.map(f=>`
+    <div class="file-item">
+      <div class="file-icon">📄</div>
+      <div class="file-main">
+        <h4>${escapeHtml(f.name)}</h4>
+        <p>
+          ${f.depo ? '🏥 '+escapeHtml(f.depo)+' &nbsp;·&nbsp; ' : ''}
+          ${f.tanggal ? '📅 '+formatTanggal(f.tanggal)+' &nbsp;·&nbsp; ' : ''}
+          ⬆ ${formatTanggalWaktu(f.uploadedAt)}
+        </p>
+        ${f.keterangan ? `<p class="ket">📝 ${escapeHtml(f.keterangan)}</p>` : ''}
+      </div>
+      <div class="file-actions">
+        <button class="btn btn-outline btn-sm" onclick="previewFile('${f.id}')">👁️ Buka</button>
+        <button class="btn btn-primary btn-sm" onclick="downloadFile('${f.id}')">⬇ Unduh</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
 }
 
-async function updateUploadStats(){
-  try{
-    const files = await dbGetAll();
-    document.getElementById('upStatTotal').textContent = files.length;
-    const now = new Date();
-    const bln = files.filter(f=>{
-      const d = new Date(f.uploadedAt);
-      return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
-    }).length;
-    document.getElementById('upStatBulan').textContent = bln;
-  }catch(e){}
+function updateUploadStats(){
+  document.getElementById('upStatTotal').textContent = berkas.length;
+  const now = new Date();
+  document.getElementById('upStatBulan').textContent = berkas.filter(f=>{
+    const d = new Date(f.uploadedAt);
+    return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+  }).length;
 }
 
-async function previewFile(id){
-  try{
-    const files = await dbGetAll();
-    const f = files.find(x=>x.id===id);
-    if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
-    const url = URL.createObjectURL(f.blob);
-    window.open(url, '_blank');
-    setTimeout(()=>URL.revokeObjectURL(url), 60000);
-  }catch(e){ toast('Gagal membuka berkas: '+e.message,'error'); }
-}
-async function downloadFile(id){
-  try{
-    const files = await dbGetAll();
-    const f = files.find(x=>x.id===id);
-    if(!f || !f.blob){ toast('Berkas tidak ditemukan','error'); return; }
-    const url = URL.createObjectURL(f.blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = f.name || 'berkas.pdf';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url), 1500);
-    toast('Mengunduh: '+f.name,'success');
-  }catch(e){ toast('Gagal mengunduh: '+e.message,'error'); }
+function previewFile(id){ window.open(driveViewUrl(id), '_blank'); }
+function downloadFile(id){
+  const f = berkas.find(x=>x.id===id);
+  window.open(driveDownloadUrl(id), '_blank');
+  toast('Mengunduh: '+(f ? f.name : 'berkas'),'success');
 }
 async function deleteFile(id){
-  if(!confirm('Hapus berkas ini?')) return;
+  if(!confirm('Hapus berkas ini dari Cloud?')) return;
   try{
-    await dbDelete(id);
-    toast('Berkas dihapus','success');
-    await renderUploadedFiles();
-    updateUploadStats();
-    if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
+    const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'deleteBerkas', id })
+    });
+    const res = await response.json();
+    if(res.status === 'success'){ toast('Berkas dihapus','success'); await loadFromGoogleSheet(); }
+    else toast('Gagal menghapus: '+res.message,'error');
   }catch(e){ toast('Gagal menghapus: '+e.message,'error'); }
 }
 
@@ -741,11 +704,18 @@ async function loadFromGoogleSheet(showToast = false) {
         })).reverse(); 
       }
 
+      // 1b. Update Berkas Hasil Rapat
+      if (Array.isArray(resData.berkas)) {
+        berkas = resData.berkas;
+      }
+      berkasLoaded = true;
+
       // 2. Update Templates
       if (Array.isArray(resData.templates)) {
         templates = resData.templates.reverse();
       }
 
+      if(document.getElementById('page-upload').classList.contains('active')) { renderUploadedFiles(); updateUploadStats(); }
       if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
       if(document.getElementById('page-template').classList.contains('active')) renderTemplates();
       
@@ -801,8 +771,7 @@ async function renderMonitoring(){
     const p = parseTanggalBulan(r.tanggal);
     return p && p.y === thn && p.m === bln;
   });
-  let files = [];
-  try { files = await dbGetAll(); } catch(e){}
+  const files = berkas;
   const hasilBulan = files.filter(f=>{
     const tgl = f.tanggal || (f.uploadedAt ? f.uploadedAt.slice(0,10) : null);
     const p = parseTanggalBulan(tgl);
