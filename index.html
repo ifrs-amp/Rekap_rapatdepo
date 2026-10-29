@@ -556,7 +556,6 @@ function doLogout(){
   location.reload();
 }
 
-// Fungsi pembantu transisi layar yang mulus
 function transitionToApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainApp').style.display = 'flex';
@@ -936,7 +935,6 @@ async function syncToGoogleSheet(undanganData) {
   };
 
   try {
-    // Menggunakan text/plain untuk menghindari preflight CORS pada Google Apps Script
     const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
@@ -959,7 +957,6 @@ async function loadFromGoogleSheet(showToast = false) {
     const data = await response.json();
     
     if (Array.isArray(data) && data.length > 0) {
-      // Timpa riwayat lokal dengan data dari Sheets agar sinkron
       riwayat = data.map((row, idx) => ({
         id: 'sheet_' + idx,
         nomor: row.nomor || '',
@@ -970,7 +967,7 @@ async function loadFromGoogleSheet(showToast = false) {
         zona: row.zona || '',
         agenda: row.agenda || '',
         createdAt: row.createdAt || new Date().toISOString()
-      })).reverse(); // Terbaru di atas
+      })).reverse();
       
       saveRiwayat();
       renderRiwayat();
@@ -1061,17 +1058,29 @@ async function renderMonitoring(){
     const badgeClass = isSudah ? 'badge-ok' : (isTerjadwal ? 'badge-info' : 'badge-warn');
     const badgeText = isSudah ? '✅ Sudah Rapat' : (isTerjadwal ? '⏳ Terjadwal' : '⚠️ Belum Rapat');
     const icon = isSudah ? '✅' : (isTerjadwal ? '⏳' : '⚠️');
+    
     let detail = '';
     if(isSudah){
       const lines = [];
       if(d.undangan.length){
         const u = d.undangan.slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||''))[0];
         lines.push(`<span class="line">📝 Undangan: ${formatTanggal(u.tanggal)}${u.agenda ? ' — '+escapeHtml(u.agenda) : ''}</span>`);
-      } else { lines.push(`<span class="line">📝 Undangan: <i>tidak ada</i></span>`); }
-      if(d.hasil.length){
-        const h = d.hasil.slice().sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt))[0];
-        const tglHasil = h.tanggal || (h.uploadedAt||'').slice(0,10);
-        lines.push(`<span class="line">📄 Hasil Rapat: ${formatTanggal(tglHasil)}${h.keterangan ? ' — '+escapeHtml(h.keterangan) : ''}</span>`);
+      } else { 
+        lines.push(`<span class="line">📝 Undangan: <i>tidak ada</i></span>`); 
+      }
+      
+      // MENAMPILKAN FILE BERKAS JIKA SUDAH RAPAT
+      if(d.hasil.length > 0){
+        let fileHtml = '<div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;">';
+        fileHtml += `<span class="line" style="margin-bottom:4px">📄 Berkas Hasil Rapat:</span>`;
+        d.hasil.forEach(h => {
+          fileHtml += `
+            <button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px; background:#fff;" onclick="previewFile('${h.id}')">👁️ ${escapeHtml(h.name)}</button>
+            <button class="btn btn-primary btn-sm" style="padding:4px 8px;font-size:11px;" onclick="downloadFile('${h.id}')">⬇️ Unduh</button>
+          `;
+        });
+        fileHtml += '</div>';
+        lines.push(fileHtml);
       }
       detail = lines.join('');
     } else if(isTerjadwal){
@@ -1080,7 +1089,9 @@ async function renderMonitoring(){
     } else {
       detail = `<span class="line">Belum ada undangan maupun hasil rapat pada bulan ini.</span>`;
     }
-    const subInfo = (isSudah || isTerjadwal) ? `<p class="mon-sub">Undangan: ${d.undangan.length} · Hasil: ${d.hasil.length}</p>` : '';
+    
+    const subInfo = (isSudah || isTerjadwal) ? `<p class="mon-sub">Total Undangan: ${d.undangan.length} · Total Berkas: ${d.hasil.length}</p>` : '';
+    
     return `
       <div class="mon-card mon-${d.status}">
         <div class="mon-icon">${icon}</div>
