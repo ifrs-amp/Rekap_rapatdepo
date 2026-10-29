@@ -118,15 +118,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .tpl-card h4{font-size:14.5px;word-break:break-all}
 .tpl-card p{font-size:12px;color:var(--muted);flex:1;line-height:1.5}
 
-/* HISTORY */
-.history-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;gap:12px;flex-wrap:wrap;background:#fff;transition:.2s}
-.history-item:hover{border-color:var(--primary)}
-.hi-main{flex:1;min-width:200px}
-.hi-main h4{font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.hi-main p{font-size:12px;color:var(--muted);margin-top:2px}
-.hi-actions{display:flex;gap:6px;flex-wrap:wrap}
-.badge{font-size:10.5px;padding:3px 9px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark);font-weight:600}
-
 /* MONITORING */
 .mon-filter{display:flex;gap:14px;flex-wrap:wrap;align-items:end}
 .mon-filter .field{margin:0;min-width:160px}
@@ -160,38 +151,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .modal-body .paper{background:#fff;padding:48px 52px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
 .icon-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:6px}
 .icon-btn:hover{background:#e2e8f0;color:var(--text)}
-
-/* LETTER */
-.letter{font-family:'Times New Roman',serif;color:#000;line-height:1.65;font-size:14px}
-.letter .kop{display:flex;gap:16px;align-items:center;padding-bottom:12px;margin-bottom:2px}
-.letter .kop .logo{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-size:32px;flex-shrink:0;border:2px solid var(--primary);color:var(--primary)}
-.letter .kop-text{flex:1;text-align:center}
-.letter .kop-text h2{font-size:18px;letter-spacing:.5px}
-.letter .kop-text h3{font-size:14px;font-weight:normal}
-.letter .kop-text p{font-size:11.5px}
-.letter .kop-line{border-bottom:3px double #000;margin-bottom:26px}
-.letter .title{text-align:center;margin:24px 0 6px}
-.letter .title h3{font-size:17px;text-decoration:underline;letter-spacing:1.5px}
-.letter .title p{font-size:13px}
-.letter .meta{margin:18px 0 18px 20px}
-.letter .meta table{border-collapse:collapse}
-.letter .meta td{padding:3px 0;vertical-align:top;font-size:14px}
-.letter .meta td:first-child{width:135px}
-.letter .meta td:nth-child(2){width:12px}
-.letter p.body-text{text-align:justify;margin:12px 0}
-.letter .ttd{margin-top:44px;display:flex;justify-content:flex-end}
-.letter .ttd-inner{text-align:center;min-width:220px}
-.letter .ttd-inner .space{height:72px}
-.letter .ttd-inner .name{font-weight:bold;text-decoration:underline}
-
-/* PRINT */
-#printArea{display:none}
-@media print{
-  body{background:#fff}
-  .app,.modal-overlay,.menu-toggle,.toast,.login-overlay{display:none!important}
-  #printArea{display:block!important}
-  @page{margin:2cm;size:A4}
-}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:9px;font-size:13.5px;font-weight:500;z-index:3000;opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90%}
@@ -370,120 +329,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
         <div id="monList"></div>
       </div>
     </section>
-
-    <section class="page" id="page-buat">
-      <div class="topbar">
-        <div><h2>Buat Undangan Rapat</h2><p>Isi data rapat, lalu preview dan cetak undangan</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="goPage('riwayat')">← Kembali ke Riwayat</button>
-      </div>
-      <div class="card">
-        <h3>📝 Formulir Undangan</h3>
-        <p class="sub">Kolom bertanda <span style="color:var(--danger)">*</span> wajib diisi.</p>
-        <form id="formUndangan" onsubmit="return false">
-          <div class="grid">
-            <div class="field full">
-              <label>Nomor Undangan <span class="hint">(opsional)</span></label>
-              <input type="text" id="inNomor" placeholder="Contoh: 001/IF/UND/X/2026">
-            </div>
-            <div class="field">
-              <label>Tanggal Undangan <span class="req">*</span></label>
-              <input type="date" id="inTanggal" required>
-            </div>
-            <div class="field">
-              <label>Nama Depo Farmasi <span class="req">*</span></label>
-              <input type="text" id="inDepo" list="listDepo" placeholder="Ketik atau pilih depo" required>
-              <datalist id="listDepo">
-                <option value="Gudang Farmasi">
-                <option value="Depo Farmasi Terpadu">
-                <option value="Depo Farmasi Rawat Inap">
-                <option value="Depo Farmasi IGD &amp; IBS">
-                <option value="Depo Farmasi Onkologi Terpadu">
-              </datalist>
-            </div>
-            <div class="field full">
-              <label>Tempat / Ruangan <span class="req">*</span></label>
-              <input type="text" id="inTempat" placeholder="Contoh: Ruangan Depo Farmasi Terpadu" required>
-            </div>
-            <div class="field">
-              <label>Waktu Rapat <span class="req">*</span></label>
-              <input type="time" id="inWaktu" required>
-            </div>
-            <div class="field">
-              <label>Zona Waktu</label>
-              <select id="inZona">
-                <option value="WIB">WIB</option>
-                <option value="WITA" selected>WITA</option>
-                <option value="WIT">WIT</option>
-              </select>
-            </div>
-            <div class="field full">
-              <label>Agenda / Pembahasan <span class="req">*</span></label>
-              <textarea id="inAgenda" placeholder="Contoh: Peresepan dan evaluasi pelayanan resep" required></textarea>
-            </div>
-          </div>
-          <div class="actions">
-            <button type="button" class="btn btn-primary" onclick="previewUndangan()">👁️ Preview & Cetak</button>
-            <button type="button" class="btn btn-outline" onclick="simpanUndangan()">💾 Simpan ke Riwayat</button>
-            <button type="button" class="btn btn-ghost" onclick="resetForm()">↺ Reset</button>
-          </div>
-        </form>
-      </div>
-      <div class="card">
-        <div class="collapse-head" id="kopHead" onclick="toggleKop()">
-          <h3>⚙️ Kop Surat &amp; Penandatangan</h3>
-          <span class="chev">▼</span>
-        </div>
-        <p class="sub" style="margin-bottom:0">Data ini dipakai pada setiap undangan yang dicetak. Klik untuk membuka/menutup.</p>
-        <div class="collapse-body" id="kopBody">
-          <form id="formSettings" onsubmit="return false">
-            <div class="grid">
-              <div class="field full"><label>Nama Rumah Sakit / Instansi</label><input id="setNamaRS"></div>
-              <div class="field full"><label>Alamat</label><input id="setAlamat"></div>
-              <div class="field"><label>No. Telepon</label><input id="setTelp"></div>
-              <div class="field"><label>Kota</label><input id="setKota"></div>
-              <div class="field"><label>Jabatan Penandatangan</label><input id="setJabatan"></div>
-              <div class="field"><label>Nama Penandatangan</label><input id="setPenandatangan"></div>
-              <div class="field full"><label>NIP</label><input id="setNip"></div>
-            </div>
-            <div class="actions">
-              <button type="button" class="btn btn-primary" onclick="simpanSettings()">💾 Simpan</button>
-              <button type="button" class="btn btn-ghost" onclick="loadSettingsToForm()">↺ Muat Ulang</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <section class="page" id="page-riwayat">
-      <div class="topbar">
-        <div><h2>Riwayat Undangan</h2><p>Daftar undangan yang telah dibuat</p></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" onclick="goPage('buat')">✍️ Buat Undangan Baru</button>
-          <button class="btn btn-ghost btn-sm" onclick="loadFromGoogleSheet(true)">🔄 Sinkronisasi Data</button>
-          <button class="btn btn-danger btn-sm" onclick="hapusSemuaRiwayat()">🗑️ Hapus Semua</button>
-        </div>
-      </div>
-      <div class="card" id="riwayatCard">
-        <div id="riwayatList"></div>
-      </div>
-    </section>
   </main>
 </div>
 
 <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-
-<div class="modal-overlay" id="previewModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>👁️ Preview Undangan</h3>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary btn-sm" onclick="cetakSekarang()">🖨️ Cetak</button>
-        <button class="icon-btn" onclick="tutupPreview()">✕</button>
-      </div>
-    </div>
-    <div class="modal-body"><div class="paper" id="previewPaper"></div></div>
-  </div>
-</div>
 
 <div id="printArea"></div>
 
@@ -493,8 +342,6 @@ const URL_GOOGLE_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzTowBsN
 
 /* ============ DATA & KONFIGURASI ============ */
 const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-
 const DEPO_LIST = [
   'Gudang Farmasi',
   'Depo Farmasi Terpadu',
@@ -503,20 +350,8 @@ const DEPO_LIST = [
   'Depo Farmasi Onkologi Terpadu'
 ];
 
-const DEFAULT_SETTINGS = {
-  namaRS:'RUMAH SAKIT UMUM DAERAH',
-  alamat:'Jl. Kesehatan No. 123, Kota Anda',
-  telp:'(0511) 1234567',
-  kota:'Kota Anda',
-  jabatan:'Kepala Instalasi Farmasi',
-  penandatangan:'apt. Nama Apoteker, S.Farm.',
-  nip:'19800101 200501 1 001'
-};
-
 let currentUser = null;
-let settings = loadSettings();
 let riwayat = loadRiwayat();
-let currentLetterHTML = '';
 let pendingFiles = [];
 
 /* ============ AUTHENTICATION & RBAC ============ */
@@ -585,7 +420,7 @@ function renderMenus(){
   ];
   if(isSuper){
     menus.splice(1, 0, { id: 'monitoring', icon: '📊', text: 'Monitoring Bulanan' });
-    menus.push({ id: 'riwayat', icon: '📋', text: 'Riwayat Undangan' });
+    // Menu Riwayat Undangan dihilangkan khusus untuk Superadmin
   }
   nav.innerHTML = menus.map(m => `
     <button class="nav-item" data-page="${m.id}" onclick="goPage('${m.id}')">
@@ -602,7 +437,6 @@ function goPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='page-'+name));
   document.getElementById('sidebar').classList.remove('open');
   
-  if(name==='riwayat') renderRiwayat();
   if(name==='upload') { renderUploadedFiles(); updateUploadStats(); }
   if(name==='monitoring') renderMonitoring();
   if(name==='template') renderTemplates();
@@ -618,19 +452,11 @@ function toast(msg,type='success'){
   requestAnimationFrame(()=>t.classList.add('show'));
   setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350)},3200);
 }
-function hariName(dateStr){
-  const [y,m,d]=dateStr.split('-').map(Number);
-  return HARI[new Date(y,m-1,d).getDay()];
-}
 function formatTanggal(dateStr){
   if(!dateStr) return '-';
   const [y,m,d]=dateStr.split('-').map(Number);
   if(!y||!m||!d) return dateStr;
   return `${d} ${BULAN[m-1]} ${y}`;
-}
-function formatWaktu(t){
-  if(!t) return '-';
-  return t.replace(':','.');
 }
 function formatTanggalWaktu(iso){
   if(!iso) return '-';
@@ -644,11 +470,6 @@ function escapeHtml(s){
 }
 
 /* ============ LOCALSTORAGE ============ */
-function loadSettings(){
-  try{ return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem('sirapat_settings')||'{}')); }
-  catch(e){ return {...DEFAULT_SETTINGS}; }
-}
-function saveSettings(){ localStorage.setItem('sirapat_settings', JSON.stringify(settings)); }
 function loadRiwayat(){
   try{ return JSON.parse(localStorage.getItem('sirapat_riwayat')||'[]'); }
   catch(e){ return []; }
@@ -700,13 +521,7 @@ async function dbDelete(store, id){
   });
 }
 
-/* ============ PANEL KOP ============ */
-function toggleKop(){
-  document.getElementById('kopBody').classList.toggle('open');
-  document.getElementById('kopHead').classList.toggle('open');
-}
-
-/* ============ MANAJEMEN TEMPLATE (SUPERADMIN & ADMIN) ============ */
+/* ============ MANAJEMEN TEMPLATE ============ */
 async function uploadTemplate(){
   const fileInput = document.getElementById('tplFile');
   const nameInput = document.getElementById('tplName');
@@ -922,62 +737,49 @@ async function deleteFile(id){
 }
 
 /* ============ SINKRONISASI KE GOOGLE SHEETS ============ */
-async function syncToGoogleSheet(undanganData) {
-  const payload = {
-    nomor: undanganData.nomor || '',
-    tanggal: undanganData.tanggal || '',
-    depo: undanganData.depo || '',
-    tempat: undanganData.tempat || '',
-    waktu: undanganData.waktu || '',
-    zona: undanganData.zona || '',
-    agenda: undanganData.agenda || '',
-    createdAt: undanganData.createdAt || new Date().toISOString()
-  };
-
-  try {
-    const response = await fetch(URL_GOOGLE_APPS_SCRIPT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(payload)
-    });
-    if (response.ok) {
-      console.log("Data berhasil dikirim ke Google Sheets");
-    }
-  } catch (error) {
-    console.error("Gagal sinkronisasi ke Google Sheets:", error);
-    toast("Gagal sinkronisasi ke Cloud, data tersimpan lokal", "error");
-  }
-}
-
 async function loadFromGoogleSheet(showToast = false) {
   try {
-    if(showToast) toast("Menarik data dari Google Sheets...", "success");
+    if(showToast) toast("Menarik data terbaru dari Google Sheets...", "success");
     
-    const response = await fetch(URL_GOOGLE_APPS_SCRIPT);
+    // Menambahkan cache: 'no-store' agar browser tidak menyimpan data lama
+    const response = await fetch(URL_GOOGLE_APPS_SCRIPT + "?t=" + new Date().getTime(), {
+      method: 'GET',
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) throw new Error("HTTP error " + response.status);
+    
     const data = await response.json();
     
-    if (Array.isArray(data) && data.length > 0) {
-      riwayat = data.map((row, idx) => ({
-        id: 'sheet_' + idx,
-        nomor: row.nomor || '',
-        tanggal: row.tanggal || '',
-        depo: row.depo || '',
-        tempat: row.tempat || '',
-        waktu: row.waktu || '',
-        zona: row.zona || '',
-        agenda: row.agenda || '',
-        createdAt: row.createdAt || new Date().toISOString()
-      })).reverse();
-      
-      saveRiwayat();
-      renderRiwayat();
-      if(showToast) toast("Data berhasil disinkronkan", "success");
-    } else if (Array.isArray(data) && data.length === 0) {
-      if(showToast) toast("Belum ada data di Google Sheets", "success");
+    if (Array.isArray(data)) {
+      if(data.length > 0) {
+        // Timpa riwayat lokal dengan data terbaru dari Sheets
+        riwayat = data.map((row, idx) => ({
+          id: 'sheet_' + idx,
+          nomor: row.nomor || '',
+          tanggal: row.tanggal || '',
+          depo: row.depo || '',
+          tempat: row.tempat || '',
+          waktu: row.waktu || '',
+          zona: row.zona || '',
+          agenda: row.agenda || '',
+          createdAt: row.createdAt || new Date().toISOString()
+        })).reverse(); 
+        
+        saveRiwayat();
+        if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
+        if(showToast) toast("Data berhasil disinkronkan ("+data.length+" baris)", "success");
+      } else {
+        // Jika Sheets kosong, hapus data lokal agar sinkron
+        riwayat = [];
+        saveRiwayat();
+        if(document.getElementById('page-monitoring').classList.contains('active')) renderMonitoring();
+        if(showToast) toast("Belum ada data di Google Sheets", "success");
+      }
     }
   } catch (error) {
     console.error("Gagal memuat data dari Google Sheets:", error);
-    if(showToast) toast("Gagal sinkronisasi, memuat data lokal", "error");
+    if(showToast) toast("Gagal sinkronisasi. Pastikan URL Web App benar & di-deploy ulang.", "error");
   }
 }
 
@@ -1066,7 +868,7 @@ async function renderMonitoring(){
         const u = d.undangan.slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||''))[0];
         lines.push(`<span class="line">📝 Undangan: ${formatTanggal(u.tanggal)}${u.agenda ? ' — '+escapeHtml(u.agenda) : ''}</span>`);
       } else { 
-        lines.push(`<span class="line">📝 Undangan: <i>tidak ada</i></span>`); 
+        lines.push(`<span class="line">📝 Undangan: <i>tidak ada (diinput manual via upload)</i></span>`); 
       }
       
       // MENAMPILKAN FILE BERKAS JIKA SUDAH RAPAT
@@ -1108,220 +910,18 @@ async function renderMonitoring(){
   }).join('');
 }
 
-/* ============ FORM UNDANGAN ============ */
-function getFormData(){
-  return {
-    nomor: document.getElementById('inNomor').value.trim(),
-    tanggal: document.getElementById('inTanggal').value,
-    depo: document.getElementById('inDepo').value.trim(),
-    tempat: document.getElementById('inTempat').value.trim(),
-    waktu: document.getElementById('inWaktu').value,
-    zona: document.getElementById('inZona').value,
-    agenda: document.getElementById('inAgenda').value.trim()
-  };
-}
-function validateForm(d){
-  if(!d.tanggal) return 'Tanggal undangan wajib diisi.';
-  if(!d.depo) return 'Nama depo farmasi wajib diisi.';
-  if(!d.tempat) return 'Tempat rapat wajib diisi.';
-  if(!d.waktu) return 'Waktu rapat wajib diisi.';
-  if(!d.agenda) return 'Agenda rapat wajib diisi.';
-  return null;
-}
-function resetForm(){
-  document.getElementById('formUndangan').reset();
-  setDefaultFormValues();
-  toast('Formulir direset','success');
-}
-function setDefaultFormValues(){
-  const t = new Date();
-  const iso = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
-  document.getElementById('inTanggal').value = iso;
-  document.getElementById('inWaktu').value = '14:00';
-  document.getElementById('inZona').value = 'WITA';
-}
-
-/* ============ BUILD LETTER ============ */
-function buildLetter(d, s){
-  const tgl = formatTanggal(d.tanggal);
-  const hari = d.tanggal ? hariName(d.tanggal) : '-';
-  const waktu = formatWaktu(d.waktu) + ' ' + d.zona;
-  return `
-    <div class="letter">
-      <div class="kop">
-        <div class="logo">⚕️</div>
-        <div class="kop-text">
-          <h2>${escapeHtml(s.namaRS)}</h2>
-          <h3>INSTALASI FARMASI</h3>
-          <p>${escapeHtml(s.alamat)}${s.telp ? ' &nbsp;|&nbsp; Telp. '+escapeHtml(s.telp) : ''}</p>
-        </div>
-      </div>
-      <div class="kop-line"></div>
-      <div class="title">
-        <h3>UNDANGAN RAPAT</h3>
-        <p>Nomor: ${escapeHtml(d.nomor || '-')}</p>
-      </div>
-      <div style="margin-top:26px">
-        <p>Kepada Yth,</p>
-        <p><strong>Seluruh Staf ${escapeHtml(d.depo)}</strong></p>
-        <p>di Tempat</p>
-      </div>
-      <p class="body-text" style="margin-top:16px">Dengan hormat,</p>
-      <p class="body-text">Sehubungan dengan akan dilaksanakannya rapat koordinasi internal, dengan ini kami mengundang Bapak/Ibu/Saudara untuk hadir pada:</p>
-      <div class="meta">
-        <table>
-          <tr><td>Hari / Tanggal</td><td>:</td><td><strong>${hari}, ${tgl}</strong></td></tr>
-          <tr><td>Waktu</td><td>:</td><td>${waktu}</td></tr>
-          <tr><td>Tempat</td><td>:</td><td>${escapeHtml(d.tempat)}</td></tr>
-          <tr><td>Agenda</td><td>:</td><td>${escapeHtml(d.agenda)}</td></tr>
-        </table>
-      </div>
-      <p class="body-text">Demikian undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, kami mengharapkan kehadiran Bapak/Ibu/Saudara tepat pada waktunya.</p>
-      <p class="body-text">Atas perhatian dan kehadirannya, kami ucapkan terima kasih.</p>
-      <div class="ttd">
-        <div class="ttd-inner">
-          <p>${escapeHtml(s.kota)}, ${tgl}</p>
-          <p>${escapeHtml(s.jabatan)}</p>
-          <div class="space"></div>
-          <p class="name">${escapeHtml(s.penandatangan)}</p>
-          <p>NIP. ${escapeHtml(s.nip)}</p>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ============ PREVIEW & CETAK ============ */
-function previewUndangan(){
-  const d = getFormData();
-  const err = validateForm(d);
-  if(err){ toast(err,'error'); return; }
-  currentLetterHTML = buildLetter(d, settings);
-  document.getElementById('previewPaper').innerHTML = currentLetterHTML;
-  document.getElementById('previewModal').classList.add('show');
-  document.body.style.overflow='hidden';
-}
-function tutupPreview(){
-  document.getElementById('previewModal').classList.remove('show');
-  document.body.style.overflow='';
-}
-function cetakSekarang(){
-  if(!currentLetterHTML){ toast('Tidak ada undangan untuk dicetak','error'); return; }
-  document.getElementById('printArea').innerHTML = currentLetterHTML;
-  setTimeout(()=>window.print(), 150);
-}
-function cetakDariRiwayat(id){
-  const item = riwayat.find(r=>r.id===id);
-  if(!item) return;
-  currentLetterHTML = buildLetter(item, settings);
-  document.getElementById('printArea').innerHTML = currentLetterHTML;
-  setTimeout(()=>window.print(), 150);
-}
-function previewDariRiwayat(id){
-  const item = riwayat.find(r=>r.id===id);
-  if(!item) return;
-  currentLetterHTML = buildLetter(item, settings);
-  document.getElementById('previewPaper').innerHTML = currentLetterHTML;
-  document.getElementById('previewModal').classList.add('show');
-  document.body.style.overflow='hidden';
-}
-document.getElementById('previewModal').addEventListener('click',e=>{
-  if(e.target.id==='previewModal') tutupPreview();
-});
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') tutupPreview(); });
-
-/* ============ SIMPAN RIWAYAT ============ */
-function simpanUndangan(){
-  const d = getFormData();
-  const err = validateForm(d);
-  if(err){ toast(err,'error'); return; }
-  const item = Object.assign({}, d, {
-    id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-    createdAt: new Date().toISOString()
-  });
-  riwayat.unshift(item);
-  saveRiwayat();
-  renderRiwayat();
-  toast('Undangan berhasil disimpan ke riwayat lokal','success');
-  
-  // SINKRONISASI KE GOOGLE SHEETS
-  syncToGoogleSheet(item);
-}
-
-/* ============ RENDER RIWAYAT ============ */
-function renderRiwayat(){
-  const list = document.getElementById('riwayatList');
-  if(!riwayat.length){
-    list.innerHTML = `<div class="empty"><span class="icon">📭</span><p>Belum ada undangan tersimpan.</p><p style="margin-top:8px;font-size:12px">Klik tombol <b>Buat Undangan Baru</b> di atas untuk memulai.</p></div>`;
-    return;
-  }
-  list.innerHTML = riwayat.map(r=>`
-    <div class="history-item">
-      <div class="hi-main">
-        <h4>${escapeHtml(r.depo)} <span class="badge">${formatTanggal(r.tanggal)}</span></h4>
-        <p>🕐 ${formatWaktu(r.waktu)} ${r.zona} &nbsp;•&nbsp; 📍 ${escapeHtml(r.tempat)}</p>
-        <p>📋 ${escapeHtml(r.agenda)}</p>
-      </div>
-      <div class="hi-actions">
-        <button class="btn btn-outline btn-sm" onclick="previewDariRiwayat('${r.id}')">👁️ Preview</button>
-        <button class="btn btn-primary btn-sm" onclick="cetakDariRiwayat('${r.id}')">🖨️ Cetak</button>
-        <button class="btn btn-danger btn-sm" onclick="hapusRiwayat('${r.id}')">🗑️</button>
-      </div>
-    </div>
-  `).join('');
-}
-function hapusRiwayat(id){
-  if(!confirm('Hapus undangan ini dari riwayat lokal?')) return;
-  riwayat = riwayat.filter(r=>r.id!==id);
-  saveRiwayat(); renderRiwayat();
-  toast('Undangan dihapus dari perangkat ini','success');
-}
-function hapusSemuaRiwayat(){
-  if(!riwayat.length){ toast('Riwayat masih kosong','error'); return; }
-  if(!confirm('Hapus SEMUA riwayat undangan di perangkat ini? (Data di Google Sheets tidak terhapus)')) return;
-  riwayat = []; saveRiwayat(); renderRiwayat();
-  toast('Semua riwayat lokal dihapus','success');
-}
-
-/* ============ KOP SURAT ============ */
-function loadSettingsToForm(){
-  document.getElementById('setNamaRS').value = settings.namaRS;
-  document.getElementById('setAlamat').value = settings.alamat;
-  document.getElementById('setTelp').value = settings.telp;
-  document.getElementById('setKota').value = settings.kota;
-  document.getElementById('setJabatan').value = settings.jabatan;
-  document.getElementById('setPenandatangan').value = settings.penandatangan;
-  document.getElementById('setNip').value = settings.nip;
-}
-function simpanSettings(){
-  settings = {
-    namaRS: document.getElementById('setNamaRS').value.trim() || DEFAULT_SETTINGS.namaRS,
-    alamat: document.getElementById('setAlamat').value.trim(),
-    telp: document.getElementById('setTelp').value.trim(),
-    kota: document.getElementById('setKota').value.trim(),
-    jabatan: document.getElementById('setJabatan').value.trim(),
-    penandatangan: document.getElementById('setPenandatangan').value.trim(),
-    nip: document.getElementById('setNip').value.trim()
-  };
-  saveSettings();
-  toast('Kop surat disimpan','success');
-}
-
 /* ============ INIT APLIKASI ============ */
 function initApp(){
   renderMenus();
   
-  // Render UI Lokal terlebih dahulu agar menu langsung muncul
+  // Render UI Lokal terlebih dahulu
   goPage('upload');
-  setDefaultFormValues();
-  loadSettingsToForm();
-  renderRiwayat();
   setupUploadZone();
   updateUploadStats();
   initMonFilter();
   renderTemplates();
 
-  // Tarik data dari Google Sheets secara background (tanpa memblokir UI)
+  // Tarik data dari Google Sheets secara background
   loadFromGoogleSheet();
 }
 
