@@ -643,7 +643,7 @@ function renderUploadedFiles(){
         ${f.keterangan ? `<p class="ket">📝 ${escapeHtml(f.keterangan)}</p>` : ''}
       </div>
       <div class="file-actions">
-        <button class="btn btn-outline btn-sm" onclick="previewFile('${f.id}')">👁️ Buka</button>
+        ${currentUser && currentUser.role === 'superadmin' ? `<button class="btn btn-outline btn-sm" onclick="previewFile('${f.id}')">👁️ Buka</button>` : ''}
         <button class="btn btn-primary btn-sm" onclick="downloadFile('${f.id}')">⬇ Unduh</button>
         <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}')">🗑️</button>
       </div>
